@@ -36,6 +36,16 @@ def dmenu_show(items):
 def open_note(note):
     subprocess.Popen(['xdg-open', note])
 
+def delete_note(path):
+    to_return = False
+    try:
+        os.remove(path)
+        to_return = True
+    except Exception as exception:
+        print(exception)
+    
+    return to_return
+
 def list_notes(path):
     notes = list()
 
@@ -68,7 +78,12 @@ def add_note(path, title_name, subtitle=str(), tags=list()):
     file_path = os.path.join(path, filename)
 
     with open(file_path, 'w') as note:
-        note.write(YAML.format(filename, subtitle, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tags))
+        note.write(
+            YAML.format(
+                filename, 
+                subtitle, 
+                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tags)
+            )
 
     return file_path
 
@@ -111,6 +126,13 @@ def cli_show_notes(path):
     for note in notes:
         print(note)
 
+def cli_delete_notes(path):
+    print("Removing {} note.".format(path))
+    if delete_note(path):
+        print("Note deleted!")
+    else:
+        print("Error during process!")
+
 def cli_arguments():
     parser = argparse.ArgumentParser()
 
@@ -144,7 +166,7 @@ def cli_arguments():
 
     parser.add_argument(
         '-l',
-        '--list',
+        '--list',  
         action='store_true',
         default=False,
         required=False
@@ -157,6 +179,13 @@ def cli_arguments():
         default=os.path.join(os.getenv('HOME'), 'Notes'),
         required=False
     )
+
+    parser.add_argument(
+        '-d',
+        '--delete',
+        required=False,
+        help='Remove note'
+        )
 
     return parser
 
@@ -176,6 +205,8 @@ def main():
         subprocess.Popen(['xdg-open', note])
     elif args.dmenu:
         dmenu_show_notes(PATH)
+    elif args.delete:
+        cli_delete_notes(args.delete)
     else:
         parser.print_help()
         parser.exit()
