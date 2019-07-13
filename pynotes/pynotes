@@ -66,7 +66,7 @@ def delete_note(path):
 def rename_note(path, new_name):
     to_return = False
     try:
-        os.rename(path, os.path.join(os.path.dirname(path), new_name))
+        os.rename(path, os.path.join(os.path.dirname(path), new_name) + ".md")
         to_return = True
     except Exception as exception:
         print(exception)
@@ -143,9 +143,37 @@ def dmenu_show_notes(dmenu, path):
         note = add_note(path, title_name=title)
         open_note(note)
     else:
-        open_note(os.path.join(path, selected))
+        dmenu_select_note(dmenu, path, os.path.join(path, selected))
 
     return selected
+
+def dmenu_select_note(dmenu, path, note_path):
+    OPEN_COMMAND    = "[open]"
+    RENAME_COMMAND  = "[rename]"
+    REMOVE_COMMAND  = "[remove]"
+    BACK_COMMAND    = "[back]"
+
+    option_list = list()
+    option_list.append(OPEN_COMMAND)
+    option_list.append(RENAME_COMMAND)
+    option_list.append(REMOVE_COMMAND)
+    option_list.append(BACK_COMMAND)
+
+    selected = dmenu.show(note_path.split('/').pop(), option_list)
+
+    if selected == OPEN_COMMAND:
+        open_note(note_path)
+
+    elif selected == RENAME_COMMAND:
+        new_name = dmenu.show("Set new name:", list())
+        rename_note(note_path, new_name)
+
+    elif selected == REMOVE_COMMAND:
+        delete_note(note_path)
+
+    elif selected == BACK_COMMAND:
+        # list_files(path)
+        pass
 
 def cli_show_notes(path):
     notes = list_notes(path)
