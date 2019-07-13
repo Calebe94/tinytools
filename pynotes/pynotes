@@ -63,6 +63,16 @@ def delete_note(path):
 
     return to_return
 
+def rename_note(path, new_name):
+    to_return = False
+    try:
+        os.rename(path, os.path.join(os.path.dirname(path), new_name))
+        to_return = True
+    except Exception as exception:
+        print(exception)
+
+    return to_return
+
 def list_notes(path):
     notes = list()
 
@@ -86,13 +96,13 @@ def add_note(path, title_name, subtitle=str(), tags=list()):
     tags = tags if tags != None else []
     file_path = str()
 
-    filename = os.path.basename(os.path.join(path, title_name))+".md"
-    path = os.path.abspath(os.path.join(path, title_name))
+    filename = os.path.basename(os.path.join(path, title_name))
+    path = os.path.dirname(os.path.join(path, title_name))
 
     if not os.path.isdir(path):
         os.makedirs(path)
 
-    file_path = os.path.join(path, filename)
+    file_path = os.path.join(path, filename+".md")
 
     with open(file_path, 'w') as note:
         note.write(
@@ -150,6 +160,13 @@ def cli_delete_notes(path):
     else:
         print("Error during process!")
 
+def cli_rename_note(path, new_name):
+    print("Renaming {} note to {}".format(os.path.basename(path), new_name))
+    if rename_note(path, new_name):
+        print("Note renamed!")
+    else:
+        print("Error during process!")
+
 def cli_arguments():
     parser = argparse.ArgumentParser()
 
@@ -162,6 +179,7 @@ def cli_arguments():
         default=os.path.join(os.getenv('HOME'), 'Notes')
     )
     parser.add_argument('-d', '--delete', required=False, help='Remove note')
+    parser.add_argument('-r', '--rename', nargs='+', required=False, help='Rename note')
     parser.add_argument('-sb', required=False, default=str(), help='Selected dmenu background')
     parser.add_argument('-sf', required=False, default=str(), help='Selected dmenu foreground')
     parser.add_argument('-nf', required=False, default=str(), help='dmenu foreground')
@@ -192,6 +210,8 @@ def main():
         dmenu_show_notes(dmenu, PATH)
     elif args.delete:
         cli_delete_notes(args.delete)
+    elif args.rename:
+        cli_rename_note(args.rename[0], args.rename[1])
     else:
         parser.print_help()
         parser.exit()
