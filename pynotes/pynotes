@@ -1,0 +1,157 @@
+#!/usr/bin/python
+
+"""
+    Ideia: No dmenu, quando for inserido notes add nome_do_arquivo deverá ser criado um arquivo
+    Markdown dentro da pasta Notes na minha pasta Home. Porém, se for inserido uma subpasta, também
+    chamada de "Notebook" da seguinte forma:
+
+        note add Nome_da_Pasta/Nome_do_arquivo
+
+    Lembrando que pode ser inserido nomes com espaço, e o script deve interpretar e poder criar,
+    as pastas e arquivos sem problema. Forma de uso com espaço:
+
+        note add Nome da Pasta/Nome do arquivo
+"""
+
+import os
+import datetime
+import subprocess
+import argparse
+import dmenu
+import glob
+
+YAML='---\ntitle: "{0}"\nsubtitle: "{1}"\ndate: "{2}"\ntags: {3}\n---'
+
+def dmenu_show(items):
+    return dmenu.show(
+        items,
+        prompt="Notes",
+        background='#1c1f25',
+        foreground='#f3f4f5',
+        background_selected='#BD93F9',
+        foreground_selected='#f3f4f5',
+        font="San Francisco Display:size=12"
+        )
+
+def list_files(path):
+    item_list = list()
+    folder_list = list()
+    items = list()
+
+    folder_list.append("[cancel]")
+    folder_list.append("[back]")
+    folder_list.append("[add]")
+
+
+    for item in os.listdir(path):
+        if os.path.isdir(os.path.join(path,item)):
+            folder_list.append(item)
+        elif not (item.endswith('.db') or item.endswith('.db-shm') or item.endswith('.db-wal')):
+            item_list.append(item)
+    items=folder_list+item_list
+
+    selected=dmenu_show(items)
+
+    if os.path.isdir(os.path.join(path, selected)):
+        selected = list_files(os.path.join(path, selected))
+    elif selected == "[back]":
+        selected = list_files(os.path.join(path, "../"))
+    elif selected == "[cancel]":
+        pass
+    elif selected in "[add]":
+        selected=dmenu_show(list())
+
+        note = add_note(path, title_name=selected)
+        subprocess.Popen(['xdg-open', note])
+
+    elif "add" in selected:
+        title = str()
+        title = selected.replace("add ", "")
+
+        note = add_note(path, title_name=title)
+        subprocess.Popen(['xdg-open', note])
+    else:
+        subprocess.Popen(['xdg-open', os.path.join(path, selected)])
+
+    return selected
+
+def add_note(path, title_name, subtitle=str(), tags=list()):
+    subtitle = subtitle if subtitle != None else ''
+    tags = tags if tags != None else []
+    file_path = str()
+
+    if '/' in title_name:
+        filename = title_name.split('/')[1]
+        subpath = title_name.split('/')[0]
+        path = os.path.join(path, subpath)
+    else:
+        filename = title_name
+
+    if not os.path.isdir(path):
+        os.mkdir(path)
+
+    file_path = os.path.join(path, filename+".md")
+
+    with open(file_path, 'w') as note:
+        note.write(YAML.format(filename, subtitle, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tags))
+
+    return file_path
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    '-a',
+    '--add',
+    required=False,
+    help='Add note'
+    )
+
+parser.add_argument(
+    '-s',
+    '--sub',
+    required=False,
+    help='Add subtitle to note'
+    )
+
+parser.add_argument(
+    '-t',
+    '--tags',
+    required=False,
+    help='Add tags to note'
+    )
+
+parser.add_argument(
+    '-l',
+    '--list',
+    action='store_true',
+    default=False,
+    required=False
+)
+
+parser.add_argument(
+    '-p',
+    '--path',
+    help='Inform path to notes folder',
+    default=os.path.join(os.getenv('HOME'), 'Notes'),
+    required=False
+)
+
+args = parser.parse_args()
+
+
+def main():
+    PATH=os.path.join(os.getenv('HOME'), 'Notes')
+
+    if args.path:
+        PATH=os.path.join(args.path)
+
+    if args.list:
+        print(list_files(PATH))
+    elif args.add:
+        note = add_note(PATH, args.add, args.sub, args.tags)
+        subprocess.Popen(['xdg-open', note])
+    else:
+        print("--help")
+
+if __name__ == "__main__":
+    main()

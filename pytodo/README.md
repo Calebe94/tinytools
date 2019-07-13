@@ -1,10 +1,8 @@
-# pyscripts
+# pytodo
 
-# Indexes
+A simple dmenu wrapper to create and access your todo list.
 
-* [pymenu - Under Development.](pymenu/README.md)
-* [pynotes - Under Development.](pynotes/README.md)
-* [pytodo - Comming Soon...](pytodo/README.md)
+Project under development.
 
 # Team
 

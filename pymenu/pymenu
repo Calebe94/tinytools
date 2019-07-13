@@ -1,0 +1,155 @@
+#!/usr/bin/python
+import os
+import subprocess
+import dmenu
+
+"""
+Funcoes de Callback podem ser path para scripts.
+"""
+
+"""
+MY DMENU MENU
+"""
+
+HOME=os.getenv("HOME")
+
+MENU_ITEMS = [
+    {
+        "name": '[cancel]',
+    },
+    {
+        "name": "notes",
+        "command": "{0}/.config/i3/scripts/notes -l -p {0}/Nextcloud/Notes".format(HOME),
+    },
+    {
+        "name": "todo",
+    },
+    {
+        "name": "settings",
+        "command": "xfce4-settings-manager",
+    },
+    {
+        "name": "passwords",
+        "command": "{0}/.config/i3/scripts/passmenu".format(HOME),
+    },
+    {
+        "name": "suspend",
+        "command": "systemctl suspend",
+    },
+    {
+        "name": "reboot",
+        "command": "systemctl reboot",
+        "confirm": "Are you sure you want to reboot?"
+    },
+    {
+        "name": "shutdown",
+        "command": "systemctl poweroff",
+        "confirm": "Are you sure you want to shutdown?"
+    },
+    {
+        "name": "logout",
+        "callback": "",
+        "confirm": "Are you sure you logout?"
+    },
+    {
+        "name": "gabo",
+        "callback": "",
+        "confirm": "Are you sure you logout?"
+    }
+]
+
+def get_item(dmenu_command, menu_items):
+    for item in menu_items:
+        try:
+            if dmenu_command == item["name"]:
+                return item
+        except Exception as error:
+            print(error)
+
+def get_command(item):
+    command = str()
+    try:
+        command = item["command"]
+    except Exception as error:
+        print("Command Error", error)
+    return command
+
+def get_callback(item):
+    callback = str()
+    try:
+        callback = item["callback"]
+    except Exception as error:
+        print("Callback Error", error)
+    return callback
+
+def get_name(item):
+    name = str()
+    try:
+        name = item["name"]
+    except Exception as error:
+        print("Name Error", error)
+    return name
+
+def get_confirm_message(item):
+    message = str()
+    try:
+        message = item["confirm"]
+    except Exception as error:
+        print("Confirm Message Error", error)
+    return message
+
+def get_show_confirm(item):
+    show = bool(False)
+    try:
+        if item["confirm"]:
+            show = True
+    except Exception as error:
+        print("Show Confirm", error)
+    return show
+
+def get_names(menu_items):
+    names_list = list()
+    for item in menu_items:
+        try:
+            names_list.append(item["name"])
+        except Exception as error:
+            print("Names", error)
+    return names_list
+
+def dmenu_show(items, message):
+    return dmenu.show(
+        items,
+        prompt=message,
+        background='#1c1f25',
+        foreground='#f3f4f5',
+        background_selected='#BD93F9',
+        foreground_selected='#f3f4f5',
+        font="San Francisco Display:size=12"
+        )
+
+def apply_command(command_name, items_list):
+    item = get_item(command_name, items_list)
+    if get_show_confirm(item) == True:
+        if dmenu_show(['no', 'yes'], get_name(item)) == 'yes':
+            print("Apply Command!")
+    else:
+        command = get_command(item)
+        if command != "":
+            # Execute Command
+            subprocess.Popen(command.split(" "))
+            pass
+        else:
+            callback = get_callback(item)
+            if callback != "":
+                # Execute Callback
+                pass
+            else:
+                pass
+
+def main():
+    selected=dmenu_show(get_names(MENU_ITEMS), "Menu")
+
+    apply_command(selected, MENU_ITEMS)
+
+if __name__ == "__main__":
+    main()

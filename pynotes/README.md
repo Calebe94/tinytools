@@ -1,10 +1,8 @@
-# pyscripts
+# pynotes
 
-# Indexes
+A simple dmenu wrapper to create and access your Markdown notes.
 
-* [pymenu - Under Development.](pymenu/README.md)
-* [pynotes - Under Development.](pynotes/README.md)
-* [pytodo - Comming Soon...](pytodo/README.md)
+Project under development.
 
 # Team
 
