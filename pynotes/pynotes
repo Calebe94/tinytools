@@ -33,125 +33,109 @@ def dmenu_show(items):
         font="San Francisco Display:size=12"
         )
 
-def list_files(path):
-    item_list = list()
-    folder_list = list()
-    items = list()
+def open_note(note):
+    subprocess.Popen(['xdg-open', note])
 
-    folder_list.append("[cancel]")
-    folder_list.append("[back]")
-    folder_list.append("[add]")
+def list_notes(path):
+    notes = list()
 
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            notes.append(os.path.join(root, name).replace(path+'/', ''))
 
-    for item in os.listdir(path):
-        if os.path.isdir(os.path.join(path,item)):
-            folder_list.append(item)
-        elif not (item.endswith('.db') or item.endswith('.db-shm') or item.endswith('.db-wal')):
-            item_list.append(item)
-    items=folder_list+item_list
+    return notes
 
-    selected=dmenu_show(items)
+def list_notes_dirs(path):
+    notes_dirs = list()
 
-    if os.path.isdir(os.path.join(path, selected)):
-        selected = list_files(os.path.join(path, selected))
-    elif selected == "[back]":
-        selected = list_files(os.path.join(path, "../"))
-    elif selected == "[cancel]":
-        pass
-    elif selected in "[add]":
-        selected=dmenu_show(list())
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in dirs:
+            notes_dirs.append(os.path.join(root, name).replace(path+'/', ''))
 
-        note = add_note(path, title_name=selected)
-        subprocess.Popen(['xdg-open', note])
-
-    elif "add" in selected:
-        title = str()
-        title = selected.replace("add ", "")
-
-        note = add_note(path, title_name=title)
-        subprocess.Popen(['xdg-open', note])
-    else:
-        subprocess.Popen(['xdg-open', os.path.join(path, selected)])
-
-    return selected
+    return notes_dirs
 
 def add_note(path, title_name, subtitle=str(), tags=list()):
     subtitle = subtitle if subtitle != None else ''
     tags = tags if tags != None else []
     file_path = str()
-
-    if '/' in title_name:
-        filename = title_name.split('/')[1]
-        subpath = title_name.split('/')[0]
-        path = os.path.join(path, subpath)
-    else:
-        filename = title_name
+    
+    filename = os.path.basename(os.path.join(path, title_name))+".md"
+    path = os.path.abspath(os.path.join(path, title_name))
 
     if not os.path.isdir(path):
-        os.mkdir(path)
+        os.makedirs(path)
 
-    file_path = os.path.join(path, filename+".md")
+    file_path = os.path.join(path, filename)
 
     with open(file_path, 'w') as note:
         note.write(YAML.format(filename, subtitle, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tags))
 
     return file_path
 
-parser = argparse.ArgumentParser()
+def cli_show_notes(path):
+    notes = list_notes(path)
 
-parser.add_argument(
-    '-a',
-    '--add',
-    required=False,
-    help='Add note'
+    for note in notes:
+        print(note)
+
+def cli_arguments():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '-a',
+        '--add',
+        required=False,
+        help='Add note'
+        )
+
+    parser.add_argument(
+        '-s',
+        '--sub',
+        required=False,
+        help='Add subtitle to note'
+        )
+
+    parser.add_argument(
+        '-t',
+        '--tags',
+        required=False,
+        help='Add tags to note'
+        )
+
+    parser.add_argument(
+        '-l',
+        '--list',
+        action='store_true',
+        default=False,
+        required=False
     )
 
-parser.add_argument(
-    '-s',
-    '--sub',
-    required=False,
-    help='Add subtitle to note'
+    parser.add_argument(
+        '-p',
+        '--path',
+        help='Inform path to notes folder',
+        default=os.path.join(os.getenv('HOME'), 'Notes'),
+        required=False
     )
 
-parser.add_argument(
-    '-t',
-    '--tags',
-    required=False,
-    help='Add tags to note'
-    )
-
-parser.add_argument(
-    '-l',
-    '--list',
-    action='store_true',
-    default=False,
-    required=False
-)
-
-parser.add_argument(
-    '-p',
-    '--path',
-    help='Inform path to notes folder',
-    default=os.path.join(os.getenv('HOME'), 'Notes'),
-    required=False
-)
-
-args = parser.parse_args()
-
+    return parser
 
 def main():
+    parser = cli_arguments()
+    args = parser.parse_args()
     PATH=os.path.join(os.getenv('HOME'), 'Notes')
 
     if args.path:
         PATH=os.path.join(args.path)
 
     if args.list:
-        print(list_files(PATH))
+        cli_show_notes(PATH)
     elif args.add:
         note = add_note(PATH, args.add, args.sub, args.tags)
         subprocess.Popen(['xdg-open', note])
     else:
-        print("--help")
+        parser.print_help()
+        parser.exit()
 
 if __name__ == "__main__":
     main()
