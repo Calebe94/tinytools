@@ -72,6 +72,39 @@ def add_note(path, title_name, subtitle=str(), tags=list()):
 
     return file_path
 
+def dmenu_show_notes(path):
+    items = list_notes(path)
+    items.insert(0, "[cancel]")
+    items.insert(1, "[back]")
+    items.insert(2, "[add]")
+
+    selected=dmenu_show(items)
+
+    if os.path.isdir(os.path.join(path, selected)):
+        selected = list_notes(os.path.join(path, selected))
+    elif selected == "[back]":
+        selected = dmenu_show_notes(os.path.join(path, "../"))
+    elif selected == "[cancel]":
+        pass
+    elif selected in "[add]":
+        selected=dmenu_show(list_notes_dirs(path))
+        while os.path.isdir(os.path.join(path, selected)):
+            path = os.path.join(path, selected)
+            selected=dmenu_show(list_notes_dirs(path))
+        note = add_note(path, title_name=selected)
+        open_note(note)
+
+    elif "add" in selected:
+        title = str()
+        title = selected.replace("add ", "")
+
+        note = add_note(path, title_name=title)
+        open_note(note)
+    else:
+        open_note(os.path.join(path, selected))
+
+    return selected
+
 def cli_show_notes(path):
     notes = list_notes(path)
 
@@ -80,6 +113,13 @@ def cli_show_notes(path):
 
 def cli_arguments():
     parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--dmenu',
+        required=False,
+        help='Shows with dmenu',
+        action='store_true'
+        )
 
     parser.add_argument(
         '-a',
@@ -130,9 +170,12 @@ def main():
 
     if args.list:
         cli_show_notes(PATH)
+
     elif args.add:
         note = add_note(PATH, args.add, args.sub, args.tags)
         subprocess.Popen(['xdg-open', note])
+    elif args.dmenu:
+        dmenu_show_notes(PATH)
     else:
         parser.print_help()
         parser.exit()
