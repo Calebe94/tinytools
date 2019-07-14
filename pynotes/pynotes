@@ -9,6 +9,13 @@ import glob
 
 YAML='---\ntitle: "{0}"\nsubtitle: "{1}"\ndate: "{2}"\ntags: {3}\n---'
 
+OPEN_COMMAND    = "[open]"
+RENAME_COMMAND  = "[rename]"
+REMOVE_COMMAND  = "[remove]"
+BACK_COMMAND    = "[back]"
+CANCEL_COMMAND  = "[cancel]"
+ADD_COMMAND     = "[add]"
+
 class Dmenu(object):
     def __init__(
         self,
@@ -116,23 +123,20 @@ def add_note(path, title_name, subtitle=str(), tags=list()):
 
 def dmenu_show_notes(dmenu, path):
     items = list_notes(path)
-    items.insert(0, "[cancel]")
-    items.insert(1, "[back]")
-    items.insert(2, "[add]")
+    items.insert(0, CANCEL_COMMAND)
+    items.insert(1, ADD_COMMAND)
 
     selected=dmenu.show("Notes", items)
 
     if os.path.isdir(os.path.join(path, selected)):
         selected = list_notes(os.path.join(path, selected))
-    elif selected == "[back]":
-        selected = dmenu_show_notes(dmenu, os.path.join(path, "../"))
-    elif selected == "[cancel]":
+    elif selected == CANCEL_COMMAND:
         pass
-    elif selected in "[add]":
-        selected=dmenu.show("Notes", list_notes_dirs(path))
+    elif selected in ADD_COMMAND:
+        selected=dmenu.show("Choose a folder:", list_notes_dirs(path))
         while os.path.isdir(os.path.join(path, selected)):
             path = os.path.join(path, selected)
-            selected=dmenu.show("Notes", list_notes_dirs(path))
+            selected=dmenu.show("Insert a name:", list_notes_dirs(path))
         note = add_note(path, title_name=selected)
         open_note(note)
 
@@ -148,10 +152,6 @@ def dmenu_show_notes(dmenu, path):
     return selected
 
 def dmenu_select_note(dmenu, path, note_path):
-    OPEN_COMMAND    = "[open]"
-    RENAME_COMMAND  = "[rename]"
-    REMOVE_COMMAND  = "[remove]"
-    BACK_COMMAND    = "[back]"
 
     option_list = list()
     option_list.append(OPEN_COMMAND)
@@ -172,8 +172,7 @@ def dmenu_select_note(dmenu, path, note_path):
         delete_note(note_path)
 
     elif selected == BACK_COMMAND:
-        # list_files(path)
-        pass
+        dmenu_show_notes(dmenu, path)
 
 def cli_show_notes(path):
     notes = list_notes(path)
