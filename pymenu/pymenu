@@ -1,62 +1,10 @@
 #!/usr/bin/python
 import os
-import subprocess
 import dmenu
+import json
 
-"""
-Funcoes de Callback podem ser path para scripts.
-"""
-
-"""
-MY DMENU MENU
-"""
-
-HOME=os.getenv("HOME")
-
-MENU_ITEMS = [
-    {
-        "name": '[cancel]',
-    },
-    {
-        "name": "notes",
-        "command": "{0}/.config/i3/scripts/notes -l -p {0}/Nextcloud/Notes".format(HOME),
-    },
-    {
-        "name": "todo",
-    },
-    {
-        "name": "settings",
-        "command": "xfce4-settings-manager",
-    },
-    {
-        "name": "passwords",
-        "command": "{0}/.config/i3/scripts/passmenu".format(HOME),
-    },
-    {
-        "name": "suspend",
-        "command": "systemctl suspend",
-    },
-    {
-        "name": "reboot",
-        "command": "systemctl reboot",
-        "confirm": "Are you sure you want to reboot?"
-    },
-    {
-        "name": "shutdown",
-        "command": "systemctl poweroff",
-        "confirm": "Are you sure you want to shutdown?"
-    },
-    {
-        "name": "logout",
-        "callback": "",
-        "confirm": "Are you sure you logout?"
-    },
-    {
-        "name": "gabo",
-        "callback": "",
-        "confirm": "Are you sure you logout?"
-    }
-]
+MENU_ITEMS = str()
+CONFIG_PATH = os.path.join(os.getenv('HOME'), '.config/pymenu.conf')
 
 def get_item(dmenu_command, menu_items):
     for item in menu_items:
@@ -130,23 +78,27 @@ def dmenu_show(items, message):
 def apply_command(command_name, items_list):
     item = get_item(command_name, items_list)
     if get_show_confirm(item) == True:
-        if dmenu_show(['no', 'yes'], get_name(item)) == 'yes':
-            print("Apply Command!")
+        if dmenu_show(['no', 'yes'], get_confirm_message(item)) == 'yes':
+            command = get_command(item)
+            os.system(command)
     else:
         command = get_command(item)
-        if command != "":
-            # Execute Command
-            subprocess.Popen(command.split(" "))
-            pass
-        else:
-            callback = get_callback(item)
-            if callback != "":
-                # Execute Callback
-                pass
-            else:
-                pass
+        os.system(command)
+
+def load_config(path):
+    menu_items = dict()
+    try:
+        with open(path, 'r') as config_file:
+            menu_items = json.load(config_file)
+    except FileNotFoundError as exception:
+        print(exception)
+        menu_items = [{"name": "ConfigFileNotFound"}]
+    
+    return menu_items
+
 
 def main():
+    MENU_ITEMS = load_config(CONFIG_PATH)
     selected=dmenu_show(get_names(MENU_ITEMS), "Menu")
 
     apply_command(selected, MENU_ITEMS)

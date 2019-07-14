@@ -1,0 +1,26 @@
+[
+    {
+        "name": "[cancel]"
+    },
+    {
+        "name": "notes",
+        "command": "$HOME/.config/i3/scripts/notes --dmenu"
+    },
+    {
+        "name": "todo"
+    },
+    {
+        "name": "suspend",
+        "command": "systemctl suspend"
+    },
+    {
+        "name": "reboot",
+        "command": "systemctl reboot",
+        "confirm": "Are you sure you want to reboot?"
+    },
+    {
+        "name": "shutdown",
+        "command": "systemctl poweroff",
+        "confirm": "Are you sure you want to shutdown?"
+    }
+]
