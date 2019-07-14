@@ -6,6 +6,17 @@ import json
 MENU_ITEMS = str()
 CONFIG_PATH = os.path.join(os.getenv('HOME'), '.config/pymenu.conf')
 
+def dmenu_show(items, message):
+    return dmenu.show(
+        items,
+        prompt=message,
+        background='#1c1f25',
+        foreground='#f3f4f5',
+        background_selected='#BD93F9',
+        foreground_selected='#f3f4f5',
+        font="San Francisco Display:size=12"
+        )
+
 def get_item(dmenu_command, menu_items):
     for item in menu_items:
         try:
@@ -22,13 +33,13 @@ def get_command(item):
         print("Command Error", error)
     return command
 
-def get_callback(item):
-    callback = str()
+def get_submenu(item):
+    submenu = list()
     try:
-        callback = item["callback"]
+        submenu = item["submenu"]
     except Exception as error:
-        print("Callback Error", error)
-    return callback
+        print("Submenu Error", error)
+    return submenu
 
 def get_name(item):
     name = str()
@@ -64,23 +75,15 @@ def get_names(menu_items):
             print("Names", error)
     return names_list
 
-def dmenu_show(items, message):
-    return dmenu.show(
-        items,
-        prompt=message,
-        background='#1c1f25',
-        foreground='#f3f4f5',
-        background_selected='#BD93F9',
-        foreground_selected='#f3f4f5',
-        font="San Francisco Display:size=12"
-        )
-
 def apply_command(command_name, items_list):
     item = get_item(command_name, items_list)
     if get_show_confirm(item) == True:
         if dmenu_show(['no', 'yes'], get_confirm_message(item)) == 'yes':
             command = get_command(item)
             os.system(command)
+    elif get_submenu(item):
+        selected = dmenu_show(get_names(get_submenu(item)), get_name(item))
+        apply_command(selected, get_submenu(item))
     else:
         command = get_command(item)
         os.system(command)
@@ -90,9 +93,18 @@ def load_config(path):
     try:
         with open(path, 'r') as config_file:
             menu_items = json.load(config_file)
+    except json.decoder.JSONDecodeError as exception: 
+        print(exception)
+        menu_items = [
+            {"name": "ConfigFileSintaxError"},
+            {"name": str(exception)}
+        ]
     except FileNotFoundError as exception:
         print(exception)
-        menu_items = [{"name": "ConfigFileNotFound"}]
+        menu_items = [
+            {"name": "ConfigFileNotFound"},
+            {"name": str(exception)}
+        ]
     
     return menu_items
 
