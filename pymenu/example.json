@@ -22,5 +22,13 @@
         "name": "shutdown",
         "command": "systemctl poweroff",
         "confirm": "Are you sure you want to shutdown?"
+    },
+    {
+        "name": "submenu",
+        "submenu": [
+            {
+                "name": "subitem 1"
+            }
+        ]
     }
 ]
