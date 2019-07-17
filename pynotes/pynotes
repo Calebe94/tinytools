@@ -126,17 +126,17 @@ def dmenu_show_notes(dmenu, path):
     items.insert(0, CANCEL_COMMAND)
     items.insert(1, ADD_COMMAND)
 
-    selected=dmenu.show("Notes", items)
+    selected = dmenu.show("Notes", items)
 
     if os.path.isdir(os.path.join(path, selected)):
         selected = list_notes(os.path.join(path, selected))
     elif selected == CANCEL_COMMAND:
         pass
     elif selected in ADD_COMMAND:
-        selected=dmenu.show("Choose a folder:", list_notes_dirs(path))
+        selected = dmenu.show("Choose a folder:", list_notes_dirs(path))
         while os.path.isdir(os.path.join(path, selected)):
             path = os.path.join(path, selected)
-            selected=dmenu.show("Insert a name:", list_notes_dirs(path))
+            selected = dmenu.show("Insert a name:", list_notes_dirs(path))
         note = add_note(path, title_name=selected)
         open_note(note)
 
@@ -147,11 +147,11 @@ def dmenu_show_notes(dmenu, path):
         note = add_note(path, title_name=title)
         open_note(note)
     else:
-        dmenu_select_note(dmenu, path, os.path.join(path, selected))
+        dmenu_select_note(dmenu, os.path.join(path, selected))
 
     return selected
 
-def dmenu_select_note(dmenu, path, note_path):
+def dmenu_select_note(dmenu, path):
 
     option_list = list()
     option_list.append(OPEN_COMMAND)
@@ -159,17 +159,17 @@ def dmenu_select_note(dmenu, path, note_path):
     option_list.append(REMOVE_COMMAND)
     option_list.append(BACK_COMMAND)
 
-    selected = dmenu.show(note_path.split('/').pop(), option_list)
+    selected = dmenu.show(os.path.basename(path), option_list)
 
     if selected == OPEN_COMMAND:
-        open_note(note_path)
+        open_note(path)
 
     elif selected == RENAME_COMMAND:
         new_name = dmenu.show("Set new name:", list())
-        rename_note(note_path, new_name)
+        rename_note(path, new_name)
 
     elif selected == REMOVE_COMMAND:
-        delete_note(note_path)
+        delete_note(path)
 
     elif selected == BACK_COMMAND:
         dmenu_show_notes(dmenu, path)
