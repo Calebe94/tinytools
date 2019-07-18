@@ -1,0 +1,86 @@
+#!/usr/bin/python
+import os
+import dmenu
+import json
+import subprocess
+
+def dmenu_show(message, items):
+    return dmenu.show(
+        items,
+        prompt=message,
+        background='#1c1f25',
+        foreground='#f3f4f5',
+        background_selected='#BD93F9',
+        foreground_selected='#f3f4f5',
+        font="San Francisco Display:size=12"
+        )
+
+def exec_todo_sh(command):
+        process = subprocess.Popen(
+                command.split(" "),
+                # stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE
+                )
+        process.wait()
+        return process.stdout.readlines()
+
+def process_output(items):
+        items_list = list()
+        for item in items:
+                item = item.decode('utf-8').strip()
+                if not item == '--':
+                        items_list.append(item)
+                else:
+                        break
+        return items_list
+
+def get_done_list():
+        items=exec_todo_sh("todo.sh listall")
+        done_list=process_output(items)
+        return done_list
+
+def get_todo_list():
+        todo_list = list()
+        items=exec_todo_sh("todo.sh list")
+        todo_list = process_output(items)
+        
+        return todo_list
+
+def sort_todo_list(todo_list):
+        sorted_list = sorted(todo_list, key=lambda x: int(x[0]))
+        return sorted_list
+
+def get_id(item):
+        item_id = str()
+        try:
+                item_id=item.split(' ')[0]
+        except Exception as exception:
+                print(exception)
+
+        return item_id
+
+def add_todo(item):
+        exec_todo_sh("todo.sh add {}".format(item))
+
+def mark_as_done(item):
+        item_id = get_id(item)
+        if (item_id != ''):
+                exec_todo_sh("todo.sh do {}".format(item_id))
+
+def main():
+        items = get_todo_list()
+        items = sort_todo_list(items)
+
+        selected = dmenu_show("TODO", items)
+
+        if selected in items:
+                mark_as_done(selected)
+                main()
+        elif selected != None:
+                add_todo(selected)
+                main()
+        else:
+                pass
+
+if __name__ == "__main__":
+        main()
