@@ -1,0 +1,11 @@
+#!/bin/bash
+
+chosen=$(/home/calebe94/Projects/pytools/pytodo/pytodo -ld | dmenu)
+
+if [[ $chosen = "[add]" ]]; then
+  echo "Add todo item."
+elif [[ $chosen = "[done]" ]]; then
+  echo "List done items."
+else
+  echo "Don't know what to do yet."
+fi
