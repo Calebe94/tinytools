@@ -4,7 +4,7 @@
 
 * [pymenu - Under Development.](pymenu/README.md)
 * [pynotes - Under Development.](pynotes/README.md)
-* [pytodo - Comming Soon...](pytodo/README.md)
+* [pytodo - Under Development.](pytodo/README.md)
 
 # Team
 
