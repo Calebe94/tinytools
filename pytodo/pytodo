@@ -1,11 +1,14 @@
 #!/usr/bin/python
 import os
-import dmenu
 import json
 import subprocess
 import argparse
+import datetime
+import shutil
 
-TODO_FOLDER = os.path.join(os.getenv('HOME'), '.todo')
+TODO_FOLDER = os.path.join(os.getenv('HOME'), '.pytodo')
+YAML='---\nname: "{0}"\ncreated: "{1}"\ndone: {2}\n---'
+
 #===================================================================================================
 #=============================================FILES=================================================
 #===================================================================================================
@@ -13,29 +16,16 @@ TODO_FOLDER = os.path.join(os.getenv('HOME'), '.todo')
 def todo_root_folder_exists():
         return os.path.isdir(TODO_FOLDER)
 
-def list_folder_exists(path):
-        return os.path.isdir(path)
-
-def file_exists(path):
-        return os.path.exists(path)
-
-def create_todo_file(path):
-        with open(os.path.join(path, 'todo.txt'), 'a'):
-                os.utime(os.path.join(path, 'todo.txt'), None)
-
-def create_done_file(path):
-        with open(os.path.join(path, 'done.txt'), 'a'):
-                os.utime(os.path.join(path, 'done.txt'), None)
-
 def check_todo_root_files():
+
         if not todo_root_folder_exists():
                 os.mkdir(TODO_FOLDER)
 
-        if not file_exists(os.path.join(TODO_FOLDER, 'todo.txt')):
-                create_todo_file(TODO_FOLDER)
+        if not os.path.isdir(os.path.join(TODO_FOLDER, "done")):
+                os.mkdir(done_folder)
 
-        if not file_exists(os.path.join(TODO_FOLDER, 'done.txt')):
-                create_done_file(TODO_FOLDER)
+        if not os.path.isdir(os.path.join(TODO_FOLDER, "todo")):
+                os.mkdir(todo_folder)
 
 #===================================================================================================
 #=============================================LISTS=================================================
@@ -44,7 +34,7 @@ def check_todo_root_files():
 def get_lists():
         lists = list()
         try:
-                lists = next(os.walk(TODO_FOLDER))[1]
+                lists = os.listdir(TODO_FOLDER)
         except Exception as identifier:
                 print(identifier)
 
@@ -53,9 +43,7 @@ def get_lists():
 def add_list(list_name):
         status = False
         try:
-                os.mkdir(os.path.join(TODO_FOLDER, list_name))
-                create_done_file(os.path.join(TODO_FOLDER, list_name))
-                create_todo_file(os.path.join(TODO_FOLDER, list_name))
+                os.mkdir(os.path.join(TODO_FOLDER, "todo", list_name))
                 status = True
         except Exception as identifier:
                 print(identifier)
@@ -65,7 +53,8 @@ def add_list(list_name):
 def remove_list(list_name):
         status = False
         try:
-                os.rmdir(os.path.join(TODO_FOLDER, list_name))
+                os.rmdir(os.path.join(TODO_FOLDER, "todo", list_name))
+                os.rmdir(os.path.join(TODO_FOLDER, "done", list_name))
                 status = True
         except Exception as identifier:
                 print(identifier)
@@ -75,7 +64,12 @@ def remove_list(list_name):
 def rename_list(list_name, new_name):
         status = False
         try:
-                os.rename(os.path.join(TODO_FOLDER, list_name), os.path.join(TODO_FOLDER, new_name))
+                os.rename(
+                        os.path.join(TODO_FOLDER, "todo", list_name),
+                        os.path.join(TODO_FOLDER, "todo", new_name))
+                os.rename(
+                        os.path.join(TODO_FOLDER, "done", list_name),
+                        os.path.join(TODO_FOLDER, "done", new_name))
                 status = True
         except Exception as identifier:
                 print(identifier)
@@ -86,97 +80,129 @@ def rename_list(list_name, new_name):
 #=============================================TODOS=================================================
 #===================================================================================================
 
-def get_done(file_path):
+def get_done(list_name):
         done_list = list()
+
         try:
-                with open(os.path.join(TODO_FOLDER, file_path, "done.txt"), 'r') as done_file:
-                        # done_list = [line.rstrip('\n') for line in done_file]
-                        done_list = [line.rstrip('\n') for line in done_file]
+                print(os.path.join(TODO_FOLDER, 'done', list_name))
+                for root, dirs, files in os.walk(os.path.join(TODO_FOLDER, 'done', list_name), topdown=False):
+                        for name in files:
+                                item = os.path.join(root, name).replace(
+                                        os.path.join(TODO_FOLDER, 'done', list_name+"/"), '')
+                                done_list.append(item)
 
         except Exception as identifier:
                 print(identifier)
+
         return done_list
 
-def get_todo(file_path):
+def get_todo(list_name):
         todo_list = list()
+
         try:
-                with open(os.path.join(TODO_FOLDER, file_path, "todo.txt"), 'r') as todo_file:
-                        # todo_list = [line.rstrip('\n') for line in todo_file]
-                        todo_list = [line.rstrip('\n') for line in todo_file]
+                for root, dirs, files in os.walk(os.path.join(TODO_FOLDER, 'todo', list_name), topdown=False):
+                        for name in files:
+                                item = os.path.join(root, name).replace(
+                                        os.path.join(TODO_FOLDER, 'todo', list_name+"/"), '')
+                                todo_list.append(item)
 
         except Exception as identifier:
                 print(identifier)
 
         return todo_list
 
-def add_todo(file_path, item):
+def add_todo(file_path):
         status = False
+        path = os.path.join(TODO_FOLDER, "todo", file_path)
+        todo_path = os.path.join(TODO_FOLDER, "todo")
+
         try:
-                with open(os.path.join(TODO_FOLDER, file_path, 'todo.txt')) as todo_file:
-                        aux_list = [line.rstrip('\n') for line in todo_file]
-                # aux_list = [x.strip() for x in aux_list]
+                if os.path.dirname(path) != todo_path and not os.path.isdir(os.path.dirname(path)):
+                        os.mkdir(os.path.dirname(path))
 
-                aux_list.append(item)
-
-                with open(os.path.join(TODO_FOLDER, file_path, 'todo.txt'), 'w') as todo_file:
-                        for aux_item in aux_list:
-                                todo_file.write(aux_item)
-                                todo_file.write('\n')
-
+                with open(path+".md", 'w') as todo_file:
+                        todo_file.write(
+                                YAML.format(os.path.basename(path),
+                                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                str()
+                                )
+                        )
                 status = True
-                print(item)
+                print("Added", file_path)
         except Exception as identifier:
                 print(identifier)
 
         return status
 
-def mark_as_done(file_path, item):
+def mark_as_done(file_path):
         status = False
-        todo_list = get_todo(file_path)
 
-        for aux in todo_list:
-                if aux == item:
-                        todo_list.pop(todo_list.index(item))
-        
-        if todo_list != get_todo(file_path):
-                try:
-                        with open(os.path.join(TODO_FOLDER, file_path, 'todo.txt'), 'w') as todo_file:
-                                for aux in todo_list:
-                                        todo_file.write(aux)
-                                        todo_file.write('\n')
+        try:
+                file_path = file_path+'.md'
+                if not os.path.isdir(os.path.join(TODO_FOLDER, 'done', os.path.dirname(file_path))) :
+                        os.mkdir(os.path.join(TODO_FOLDER, 'done', os.path.dirname(file_path)))
 
-                        done_list = get_done(file_path)
-                        done_list.append(item)
+                content = list()
 
-                        with open(os.path.join(TODO_FOLDER, file_path, 'done.txt'), 'w') as done_file:
-                                for aux in done_list:
-                                        done_file.write(aux)
-                                        done_file.write('\n')
-                except Exception as identifier:
-                        print(identifier)
+                with open(os.path.join(TODO_FOLDER, 'todo', file_path)) as todo_file:
+                        content = todo_file.readlines()
+
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                done_timestamp = 'done: "{}"\n'.format(timestamp)
+
+                new_content = [done_timestamp if "done:" in line else line for line in content]
+
+                if content == new_content:
+                        new_content = [line+done_timestamp if "created:" in line else line for line in content]
+                        print(new_content)
+
+                new_content = ''.join(new_content)
+
+                with open(os.path.join(TODO_FOLDER, 'todo', file_path), 'w') as todo_file:
+                        todo_file.write(new_content)
+
+                shutil.move(
+                        os.path.join(TODO_FOLDER, 'todo', file_path),
+                        os.path.join(TODO_FOLDER, 'done', file_path) )
+
+        except Exception as identifier:
+                print(identifier)
+
+        return status
 
 def edit_todo(file_path, item):
-        pass
+        webbrowser()
 
 def get_todo_lists():
-        lists = get_lists()
-        todo_list = []
+        todo_list = list()
 
-        for list in lists:
-                todo = get_todo(list)
-                todo_list += [os.path.join(list, line.rstrip('\n')) for line in todo]
-        
+        try:
+                for root, dirs, files in os.walk(os.path.join(TODO_FOLDER, 'todo'), topdown=False):
+                        for name in files:
+                                item = os.path.join(root, name).replace(
+                                        os.path.join(TODO_FOLDER, 'todo/'), '')
+                                todo_list.append(item)
+
+        except Exception as identifier:
+                print(identifier)
+
         return todo_list
 
 def get_done_lists():
-        lists = get_lists()
-        todo_list = []
+        done_list = list()
 
-        for list in lists:
-                todo = get_done(list)
-                todo_list += [os.path.join(list, line.rstrip('\n')) for line in todo]
-        
-        return todo_list
+        try:
+                for root, dirs, files in os.walk(os.path.join(TODO_FOLDER, 'done'), topdown=False):
+                        for name in files:
+                                item = os.path.join(root, name).replace(
+                                        os.path.join(TODO_FOLDER, 'done/'), '')
+                                done_list.append(item)
+
+        except Exception as identifier:
+                print(identifier)
+
+        return done_list
 
 #===================================================================================================
 #=============================================TESTS=================================================
@@ -185,10 +211,6 @@ def get_done_lists():
 def test():
         print("> Executing Tests!")
         print("==========================================\n")
-
-        # create_files()
-
-        import time
 
         print("> Add list: To Buy")
         print(add_list("To Buy"))
@@ -202,19 +224,13 @@ def test():
         print(add_list("Work"))
         print('----------------------------------------\n')
 
-        time.sleep(1)
-
         print("> Rename list: To Buy -> Health")
         print(rename_list("To Buy", "Health"))
         print('----------------------------------------\n')
 
-        time.sleep(1)
-
         print("> Rename list: Health -> To Buy")
         print(rename_list("Health", "To Buy"))
         print('----------------------------------------\n')
-
-        time.sleep(1)
 
         print("> Remove list: To Buy")
         print(remove_list("To Buy"))
@@ -225,54 +241,50 @@ def test():
         print('----------------------------------------\n')
 
         print("> Adding Items to Work\n")
-        add_todo("Work", 'Test1')
-        add_todo("Work", 'Test2')
-        add_todo("Work", 'Test3')
-        add_todo("Work", 'Test4')
-        add_todo("Work", 'Test5')
-        add_todo("Work", 'Test6')
+        add_todo("Work/Test1")
+        add_todo("Work/Test2")
+        add_todo("Work/Test3")
+        add_todo("Work/Test4")
+        add_todo("Work/Test5")
+        add_todo("Work/Test6")
         print('----------------------------------------')
 
         print("> Get Work TODO List!\n")
         print(get_todo("Work"))
         print('----------------------------------------')
-        
+
         print("> Marking 'Test1' and 'Test5' from Work as done!\n")
-        mark_as_done("Work", 'Test1')
-        mark_as_done("Work", 'Test5')
+        mark_as_done("Work/Test1")
+        mark_as_done("Work/Test5")
         print('----------------------------------------')
-        
+
         print("> Get Work TODO List!\n")
         print(get_todo("Work"))
         print('----------------------------------------')
-        
+
         print("> Get Work Done List!\n")
         print(get_done("Work"))
         print('----------------------------------------')
-        
+
         print("> Removing everything!\n")
-        print("> Reminders/done.txt")
-        os.remove(os.path.join(TODO_FOLDER, "Reminders", "done.txt"))
-        print("> Reminders/todo.txt")
-        os.remove(os.path.join(TODO_FOLDER, "Reminders", "todo.txt"))
-        print("> Reminders/")
-        os.rmdir(os.path.join(TODO_FOLDER, "Reminders"))
-        print("> To Buy/done.txt")
-        os.remove(os.path.join(TODO_FOLDER, "To Buy", "done.txt"))
-        print("> To Buy/todo.txt")
-        os.remove(os.path.join(TODO_FOLDER, "To Buy", "todo.txt"))
-        print("> To Buy/")
-        os.rmdir(os.path.join(TODO_FOLDER, "To Buy"))
-        print("> Work/done.txt")
-        os.remove(os.path.join(TODO_FOLDER, "Work", "done.txt"))
-        print("> Work/todo.txt")
-        os.remove(os.path.join(TODO_FOLDER, "Work", "todo.txt"))
-        print("> Work/")
-        os.rmdir(os.path.join(TODO_FOLDER, "Work"))
-        print("> done.txt")
-        os.remove(os.path.join(TODO_FOLDER, "done.txt"))
-        print("> todo.txt")
-        os.remove(os.path.join(TODO_FOLDER, "todo.txt"))
+        print("> todo/Reminders/")
+        os.rmdir(os.path.join(TODO_FOLDER, "todo", "Reminders"))
+        print("> todo/Work/Test2.md")
+        os.remove(os.path.join(TODO_FOLDER, "todo", "Work", "Test2.md"))
+        print("> todo/Work/Test3.md")
+        os.remove(os.path.join(TODO_FOLDER, "todo", "Work", "Test3.md"))
+        print("> todo/Work/Test4.md")
+        os.remove(os.path.join(TODO_FOLDER, "todo", "Work", "Test4.md"))
+        print("> todo/Work/Test6.md")
+        os.remove(os.path.join(TODO_FOLDER, "todo", "Work", "Test6.md"))
+        print("> todo/Work/")
+        os.rmdir(os.path.join(TODO_FOLDER, "todo", "Work"))
+        print("> done/Work/Test1.md")
+        os.remove(os.path.join(TODO_FOLDER, "done", "Work", "Test1.md"))
+        print("> done/Work/Test5.md")
+        os.remove(os.path.join(TODO_FOLDER, "done", "Work", "Test5.md"))
+        print("> done/Work/")
+        os.rmdir(os.path.join(TODO_FOLDER, "done", "Work"))
 
 #===================================================================================================
 #==============================================MAIN=================================================
@@ -282,14 +294,17 @@ def cli_arguments():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-a', '--add', required=False, help='Add note')
-    parser.add_argument('-ld', '--listdone', dest='command', action='store_const', 
+    parser.add_argument('-ld', '--listdone', dest='command', action='store_const',
         const='listdone', required=False)
-    parser.add_argument('-lt', '--listtodo', dest='command', action='store_const', 
+    parser.add_argument('-lt', '--listtodo', dest='command', action='store_const',
         const='listtodo', required=False)
+    parser.add_argument('-l', '--list', dest='command', action='store_const',
+        const='list', required=False)
 
     parser.add_argument('-d', '--do', required=False, help='Add note')
     parser.add_argument('-u', '--undo', required=False, help='Add note')
-    
+    parser.add_argument('-t', '--test', action='store_true', required=False, help='Test script')
+
     parser.add_argument('-p', '--path', help='Inform path to notes folder', required=False,
         default=os.path.join(os.getenv('HOME'), '.todo')
     )
@@ -298,7 +313,7 @@ def cli_arguments():
 
 def main():
         check_todo_root_files()
-        # test()
+
         parser = cli_arguments()
         args = parser.parse_args()
 
@@ -311,21 +326,11 @@ def main():
         elif args.undo:
                 print("UNDO", args.undo)
         elif args.do:
-                # print("DO", args.do)
-                path = os.path.join(TODO_FOLDER, args.do)
-                basename = os.path.basename(path)
-                dirname = os.path.dirname(path)
-                mark_as_done(os.path.basename(dirname), basename)
+                mark_as_done(args.do)
         elif args.add:
-                # print("Added", args.add)
-                path = os.path.join(TODO_FOLDER, args.add)
-                basename = os.path.basename(path)
-                dirname = os.path.dirname(path)
-                if not (dirname == TODO_FOLDER) and os.path.isdir(dirname) == False:
-                        add_list(os.path.basename(dirname))
-                        # print(dirname, "created.")
-                        
-                add_todo(os.path.basename(dirname), basename)
+                add_todo(args.add)
+        elif args.test:
+                test()
         else:
                 parser.print_help()
                 parser.exit()
