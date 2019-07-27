@@ -89,7 +89,7 @@ list_todo()
   if grep -Fxq "$chosen" $DMENU_ITEMS
   then 
     case "$chosen" in
-      *"[add]"*)    todo=$(echo -e "" | dmenu -p "Add:") ;  add_note "$todo"; list_todo ;;
+      *"[add]"*)    todo=$(echo -e "" | dmenu -p "Add:" $DMENU_ARGS) ;  add_note "$todo"; list_todo ;;
       *"[done]"*)   list_done ;;
       *)            todo_selection "$chosen";;
     esac
@@ -106,7 +106,7 @@ list_todo()
 todo_selection()
 {
   chosen=$@
-  action=$(echo -e "[do]\n[edit]\n[back]" | dmenu -p "Action")
+  action=$(echo -e "[do]\n[edit]\n[back]" | dmenu -p "$chosen" $DMENU_ARGS)
   case "$action" in
     *"[do]"*)   mark_as_done "$chosen" ;;
     *"[edit]"*) xdg-open "$($PYTODO -fp "$chosen")" ;;
@@ -122,7 +122,7 @@ todo_selection()
 done_selection()
 {
   chosen=$1
-  action=$(echo -e "[undo]\n[edit]\n[back]" | dmenu -p "Action")
+  action=$(echo -e "[undo]\n[edit]\n[back]" | dmenu -p "$chosen"py $DMENU_ARGS)
   case "$action" in
     *"[undo]"*)   mark_as_undone "$chosen" ;;
     *"[edit]"*)   xdg-open "$($PYTODO -fp "$chosen")" ;;
