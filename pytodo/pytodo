@@ -27,6 +27,16 @@ def check_todo_root_files():
         if not os.path.isdir(os.path.join(TODO_FOLDER, "todo")):
                 os.mkdir(todo_folder)
 
+def get_file_path(filename):
+        try:
+                for root, dirs, files in os.walk(os.path.join(TODO_FOLDER), topdown=False):
+                        for name in files:
+                                if filename in os.path.join(root, name):
+                                        print(os.path.join(root, name))
+
+        except Exception as identifier:
+                print(identifier)
+
 #===================================================================================================
 #=============================================LISTS=================================================
 #===================================================================================================
@@ -84,11 +94,11 @@ def get_done(list_name):
         done_list = list()
 
         try:
-                print(os.path.join(TODO_FOLDER, 'done', list_name))
                 for root, dirs, files in os.walk(os.path.join(TODO_FOLDER, 'done', list_name), topdown=False):
                         for name in files:
                                 item = os.path.join(root, name).replace(
                                         os.path.join(TODO_FOLDER, 'done', list_name+"/"), '')
+                                print(item)
                                 done_list.append(item)
 
         except Exception as identifier:
@@ -119,16 +129,19 @@ def add_todo(file_path):
         try:
                 if os.path.dirname(path) != todo_path and not os.path.isdir(os.path.dirname(path)):
                         os.mkdir(os.path.dirname(path))
-
-                with open(path+".md", 'w') as todo_file:
-                        todo_file.write(
-                                YAML.format(os.path.basename(path),
-                                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                str()
+                
+                if os.path.exists(path+".md"):
+                        print(file_path, "already exists!")
+                else:
+                        with open(path+".md", 'w') as todo_file:
+                                todo_file.write(
+                                        YAML.format(os.path.basename(path),
+                                        datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                        str()
+                                        )
                                 )
-                        )
-                status = True
-                print("Added", file_path)
+                        status = True
+                        print("Added", file_path)
         except Exception as identifier:
                 print(identifier)
 
@@ -136,7 +149,7 @@ def add_todo(file_path):
 
 def mark_as_done(file_path):
         status = False
-
+        aux_file_path = file_path
         try:
                 file_path = file_path+'.md'
                 if not os.path.isdir(os.path.join(TODO_FOLDER, 'done', os.path.dirname(file_path))) :
@@ -165,14 +178,44 @@ def mark_as_done(file_path):
                 shutil.move(
                         os.path.join(TODO_FOLDER, 'todo', file_path),
                         os.path.join(TODO_FOLDER, 'done', file_path) )
+                
+                print(aux_file_path, "marked as done!")
 
         except Exception as identifier:
                 print(identifier)
 
         return status
 
-def edit_todo(file_path, item):
-        webbrowser()
+def mark_as_undone(file_path):
+        status = False
+        aux_file_path = file_path
+        try:
+                file_path = file_path+'.md'
+                if not os.path.isdir(os.path.join(TODO_FOLDER, 'todo', os.path.dirname(file_path))) :
+                        os.mkdir(os.path.join(TODO_FOLDER, 'todo', os.path.dirname(file_path)))
+
+                content = list()
+
+                with open(os.path.join(TODO_FOLDER, 'done', file_path)) as todo_file:
+                        content = todo_file.readlines()
+
+                new_content = ["done:\n" if "done:" in line else line for line in content]
+
+                new_content = ''.join(new_content)
+
+                with open(os.path.join(TODO_FOLDER, 'done', file_path), 'w') as todo_file:
+                        todo_file.write(new_content)
+
+                shutil.move(
+                        os.path.join(TODO_FOLDER, 'done', file_path),
+                        os.path.join(TODO_FOLDER, 'todo', file_path) )
+                
+                print(aux_file_path, "marked as undone!")
+        except Exception as identifier:
+                print(identifier)
+
+        return status
+
 
 def get_todo_lists():
         todo_list = list()
@@ -182,7 +225,7 @@ def get_todo_lists():
                         for name in files:
                                 item = os.path.join(root, name).replace(
                                         os.path.join(TODO_FOLDER, 'todo/'), '')
-                                todo_list.append(item)
+                                todo_list.append(os.path.splitext(item)[0])
 
         except Exception as identifier:
                 print(identifier)
@@ -197,7 +240,8 @@ def get_done_lists():
                         for name in files:
                                 item = os.path.join(root, name).replace(
                                         os.path.join(TODO_FOLDER, 'done/'), '')
-                                done_list.append(item)
+
+                                done_list.append(os.path.splitext(item)[0])
 
         except Exception as identifier:
                 print(identifier)
@@ -303,6 +347,8 @@ def cli_arguments():
 
     parser.add_argument('-d', '--do', required=False, help='Add note')
     parser.add_argument('-u', '--undo', required=False, help='Add note')
+    parser.add_argument('-fp', '--filepath', required=False, help='File path')
+
     parser.add_argument('-t', '--test', action='store_true', required=False, help='Test script')
 
     parser.add_argument('-p', '--path', help='Inform path to notes folder', required=False,
@@ -324,13 +370,15 @@ def main():
                 for item in get_todo_lists():
                         print(item)
         elif args.undo:
-                print("UNDO", args.undo)
+                mark_as_undone(args.undo)
         elif args.do:
                 mark_as_done(args.do)
         elif args.add:
                 add_todo(args.add)
         elif args.test:
                 test()
+        elif args.filepath:
+                get_file_path(args.filepath)
         else:
                 parser.print_help()
                 parser.exit()
