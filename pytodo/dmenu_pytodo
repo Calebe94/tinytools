@@ -1,0 +1,136 @@
+#!/bin/bash
+
+####################################################################################################
+# Variables used in the script.
+####################################################################################################
+DMENU_ITEMS="/tmp/dmenu_items"
+DMENU_ARGS=$@
+PYTODO=$HOME/.scripts/pytodo
+
+###################################################################################################
+# add_note function
+# takes 1(one) argument: the name of the element to add.
+###################################################################################################
+add_note()
+{
+  echo "Add Note"
+  $HOME/.scripts/pytodo -a "$1"
+}
+
+###################################################################################################
+# mark_as_done function
+# takes 1(one) argument: the name of the element to mark as done.
+###################################################################################################
+mark_as_done()
+{
+  status=$($PYTODO -d "$1")
+  echo $status
+  if [ "$status" == "$1 marked as done!" ]; then
+    echo "DONE"
+  else
+    add_note "$1"
+  fi
+}
+
+###################################################################################################
+# mark_as_undone function
+# takes 1(one) argument: the name of the element to mark as undone.
+###################################################################################################
+mark_as_undone()
+{
+  status=$($PYTODO -u "$1")
+  echo $status
+  if [ "$status" == "$1 marked as undone!" ]; then
+    echo "DONE"
+  else
+    add_note "$1"
+  fi
+}
+
+###################################################################################################
+# list_done function
+# Lists the done items
+###################################################################################################
+list_done()
+{
+  echo "Show done"
+
+  actions="[back]"
+
+  echo -e $actions > $DMENU_ITEMS
+
+  $HOME/.scripts/pytodo -ld >> $DMENU_ITEMS
+
+  chosen=$(cat $DMENU_ITEMS | dmenu -p "Done" $DMENU_ARGS)
+
+  if grep -Fxq "$chosen" $DMENU_ITEMS
+  then 
+    case "$chosen" in
+      *"[back]"*)   list_todo ;;
+      *)            done_selection "$chosen";;
+    esac
+  fi
+}
+
+###################################################################################################
+# list_todo function
+# Lists the todo items
+###################################################################################################
+list_todo()
+{
+  actions="[add]\n[done]"
+
+  echo -e $actions > $DMENU_ITEMS
+
+  $HOME/.scripts/pytodo -lt >> $DMENU_ITEMS
+
+  chosen=$(cat $DMENU_ITEMS | dmenu -p "Todo" $DMENU_ARGS)
+
+  if grep -Fxq "$chosen" $DMENU_ITEMS
+  then 
+    case "$chosen" in
+      *"[add]"*)    todo=$(echo -e "" | dmenu -p "Add:") ;  add_note "$todo"; list_todo ;;
+      *"[done]"*)   list_done ;;
+      *)            todo_selection "$chosen";;
+    esac
+  else
+    add_note "$chosen"
+  fi
+}
+
+###################################################################################################
+# todo_selection function
+# takes 1(one) argument: the name of the element selected.
+# The function now uses DMENU to show some options to you.
+###################################################################################################
+todo_selection()
+{
+  chosen=$@
+  action=$(echo -e "[do]\n[edit]\n[back]" | dmenu -p "Action")
+  case "$action" in
+    *"[do]"*)   mark_as_done "$chosen" ;;
+    *"[edit]"*) xdg-open "$($PYTODO -fp "$chosen")" ;;
+    *"[back]"*) list_todo ;;
+  esac
+}
+
+###################################################################################################
+# done_selection function
+# takes 1(one) argument: the name of the element selected.
+# The function now uses DMENU to show some options to you.
+###################################################################################################
+done_selection()
+{
+  chosen=$1
+  action=$(echo -e "[undo]\n[edit]\n[back]" | dmenu -p "Action")
+  case "$action" in
+    *"[undo]"*)   mark_as_undone "$chosen" ;;
+    *"[edit]"*)   xdg-open "$($PYTODO -fp "$chosen")" ;;
+    *"[back]"*)   list_done ;;
+  esac
+}
+
+###################################################################################################
+############################################## MAIN ###############################################
+###################################################################################################
+list_todo
