@@ -4,81 +4,46 @@ import os
 import datetime
 import subprocess
 import argparse
-import dmenu
-import glob
 
-YAML='---\ntitle: "{0}"\nsubtitle: "{1}"\ndate: "{2}"\ntags: {3}\n---'
+YAML = '---\ntitle: "{0}"\nsubtitle: "{1}"\ndate: "{2}"\ntags: {3}\n---'
 
-OPEN_COMMAND    = "[open]"
-RENAME_COMMAND  = "[rename]"
-REMOVE_COMMAND  = "[remove]"
-BACK_COMMAND    = "[back]"
-CANCEL_COMMAND  = "[cancel]"
-ADD_COMMAND     = "[add]"
-
-class Dmenu(object):
-    def __init__(
-        self,
-        background=str("#222222"),
-        foreground=str("#bbbbbb"),
-        background_selected=str("#005577"),
-        foreground_selected=str("#00ffff"),
-        font=str()
-        ):
-        self.__background = background
-        self.__foreground = foreground
-        self.__background_selected = background_selected
-        self.__foreground_selected = foreground_selected
-        self.__font = font
-
-    def set_background(self, color):
-        self.__background = color
-
-    def set_foreground(self, color):
-        self.__foreground = color
-
-    def set_background_selected(self, color):
-        self.__background_selected = color
-
-    def set_foreground_selected(self, color):
-        self.__foreground_selected = color
-
-    def set_font(self, font):
-        self.__font = font
-
-    def show(self, prompt=str(), items=list()):
-        return dmenu.show(
-            items,
-            prompt=prompt,
-            background=self.__background,
-            foreground=self.__foreground,
-            background_selected=self.__background_selected,
-            foreground_selected=self.__foreground_selected,
-            font=self.__font
-            )
-
-def open_note(note):
-    subprocess.Popen(['xdg-open', note])
 
 def delete_note(path):
     to_return = False
     try:
-        os.remove(path)
+        os.remove(path+".md")
         to_return = True
     except Exception as exception:
         print(exception)
 
     return to_return
 
-def rename_note(path, new_name):
+
+def rename_note(path, name, new_name):
     to_return = False
+
     try:
-        os.rename(path, os.path.join(os.path.dirname(path), new_name) + ".md")
+        os.rename(
+            os.path.join(path, name),
+            os.path.join(path, new_name)+".md"
+        )
         to_return = True
     except Exception as exception:
         print(exception)
 
     return to_return
+
+
+def get_file_path(path, filename):
+    try:
+        for root, dirs, files in os.walk(os.path.join(path), topdown=False):
+            for name in files:
+                if os.path.join(path, filename) == os.path.join(root, name):
+                    print(os.path.join(root, name))
+
+    except Exception as identifier:
+        print(identifier)
+
 
 def list_notes(path):
     notes = list()
@@ -89,6 +54,7 @@ def list_notes(path):
 
     return notes
 
+
 def list_notes_dirs(path):
     notes_dirs = list()
 
@@ -97,6 +63,7 @@ def list_notes_dirs(path):
             notes_dirs.append(os.path.join(root, name).replace(path+'/', ''))
 
     return notes_dirs
+
 
 def add_note(path, title_name, subtitle=str(), tags=list()):
     subtitle = subtitle if subtitle != None else ''
@@ -117,62 +84,10 @@ def add_note(path, title_name, subtitle=str(), tags=list()):
                 filename,
                 subtitle,
                 datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tags)
-            )
-
+        )
+    print("{} added!".format(file_path))
     return file_path
 
-def dmenu_show_notes(dmenu, path):
-    items = list_notes(path)
-    items.insert(0, CANCEL_COMMAND)
-    items.insert(1, ADD_COMMAND)
-
-    selected = dmenu.show("Notes", items)
-
-    if os.path.isdir(os.path.join(path, selected)):
-        selected = list_notes(os.path.join(path, selected))
-    elif selected == CANCEL_COMMAND:
-        pass
-    elif selected in ADD_COMMAND:
-        selected = dmenu.show("Choose a folder:", list_notes_dirs(path))
-        while os.path.isdir(os.path.join(path, selected)):
-            path = os.path.join(path, selected)
-            selected = dmenu.show("Insert a name:", list_notes_dirs(path))
-        note = add_note(path, title_name=selected)
-        open_note(note)
-
-    elif "add" in selected:
-        title = str()
-        title = selected.replace("add ", "")
-
-        note = add_note(path, title_name=title)
-        open_note(note)
-    else:
-        dmenu_select_note(dmenu, os.path.join(path, selected))
-
-    return selected
-
-def dmenu_select_note(dmenu, path):
-
-    option_list = list()
-    option_list.append(OPEN_COMMAND)
-    option_list.append(RENAME_COMMAND)
-    option_list.append(REMOVE_COMMAND)
-    option_list.append(BACK_COMMAND)
-
-    selected = dmenu.show(os.path.basename(path), option_list)
-
-    if selected == OPEN_COMMAND:
-        open_note(path)
-
-    elif selected == RENAME_COMMAND:
-        new_name = dmenu.show("Set new name:", list())
-        rename_note(path, new_name)
-
-    elif selected == REMOVE_COMMAND:
-        delete_note(path)
-
-    elif selected == BACK_COMMAND:
-        dmenu_show_notes(dmenu, path)
 
 def cli_show_notes(path):
     notes = list_notes(path)
@@ -180,68 +95,65 @@ def cli_show_notes(path):
     for note in notes:
         print(note)
 
+
 def cli_delete_notes(path):
-    print("Removing {} note.".format(path))
     if delete_note(path):
-        print("Note deleted!")
+        print("{} deleted!".format(path))
     else:
         print("Error during process!")
 
-def cli_rename_note(path, new_name):
-    print("Renaming {} note to {}".format(os.path.basename(path), new_name))
-    if rename_note(path, new_name):
-        print("Note renamed!")
+
+def cli_rename_note(path, name, new_name):
+    if rename_note(path, name, new_name):
+        print("{} renamed to {}.".format(os.path.basename(path), new_name))
     else:
         print("Error during process!")
+
 
 def cli_arguments():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dmenu', required=False, help='Shows with dmenu', action='store_true')
     parser.add_argument('-a', '--add', required=False, help='Add note')
-    parser.add_argument('-s', '--sub', required=False, help='Add subtitle to note')
-    parser.add_argument('-t', '--tags', required=False, help='Add tags to note')
-    parser.add_argument('-l', '--list', action='store_true', default=False, required=False)
+    parser.add_argument('-s', '--sub', required=False,
+                        help='Add subtitle to note')
+    parser.add_argument('-t', '--tags', required=False,
+                        help='Add tags to note')
+    parser.add_argument('-l', '--list', action='store_true',
+                        default=False, required=False)
     parser.add_argument('-p', '--path', help='Inform path to notes folder', required=False,
-        default=os.path.join(os.getenv('HOME'), 'Notes')
-    )
+                        default=os.path.join(os.getenv('HOME'), 'Notes')
+                        )
     parser.add_argument('-d', '--delete', required=False, help='Remove note')
-    parser.add_argument('-r', '--rename', nargs='+', required=False, help='Rename note')
-    parser.add_argument('-sb', required=False, default=str(), help='Selected dmenu background')
-    parser.add_argument('-sf', required=False, default=str(), help='Selected dmenu foreground')
-    parser.add_argument('-nf', required=False, default=str(), help='dmenu foreground')
-    parser.add_argument('-nb', required=False, default=str(), help='dmenu background')
-    parser.add_argument('-fn', required=False, default=str(), help='dmenu font')
+    parser.add_argument('-r', '--rename', nargs='+',
+                        required=False, help='Rename note')
+    parser.add_argument('-fp', '--filepath',
+                        required=False, help='Get file path')
 
     return parser
+
 
 def main():
     parser = cli_arguments()
     args = parser.parse_args()
-    PATH=os.path.join(os.getenv('HOME'), 'Notes')
+    PATH = os.path.join(os.getenv('HOME'), 'Notes')
 
     if args.path:
-        PATH=os.path.join(args.path)
+        PATH = os.path.join(args.path)
 
     if args.list:
         cli_show_notes(PATH)
     elif args.add:
-        note = add_note(PATH, args.add, args.sub, args.tags)
-        subprocess.Popen(['xdg-open', note])
-    elif args.dmenu:
-        nb = args.nb if args.nb != '' else  "#222222"
-        nf = args.nf if args.nb != '' else  "#bbbbbb"
-        sb = args.sb if args.nb != '' else  "#005577"
-        sf = args.sf if args.nb != '' else  "#00ffff"
-        dmenu = Dmenu(nb, nf, sb, sf, args.fn)
-        dmenu_show_notes(dmenu, PATH)
+        add_note(PATH, args.add, args.sub, args.tags)
     elif args.delete:
-        cli_delete_notes(args.delete)
+        cli_delete_notes(os.path.join(PATH, args.delete))
     elif args.rename:
-        cli_rename_note(args.rename[0], args.rename[1])
+        cli_rename_note(PATH, args.rename[0], args.rename[1])
+    elif args.filepath:
+        get_file_path(PATH, args.filepath)
     else:
         parser.print_help()
         parser.exit()
+
 
 if __name__ == "__main__":
     main()
