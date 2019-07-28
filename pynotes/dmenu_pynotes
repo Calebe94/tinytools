@@ -1,0 +1,88 @@
+#!/bin/bash
+
+####################################################################################################
+# Variables used in the script.
+####################################################################################################
+DMENU_ITEMS="/tmp/dmenu_items"
+DMENU_ARGS=$@
+PYNOTES=$HOME/.scripts/pynotes
+
+###################################################################################################
+# add_note function
+# takes 1(one) argument: the name of the element to add.
+###################################################################################################
+add_note()
+{
+    $PYNOTES -a "$@"
+    xdg-open "$($PYNOTES -fp "$@.md")"
+}
+
+###################################################################################################
+# rename_note function
+# takes 1(one) argument: the name of the element to rename.
+###################################################################################################
+rename_note()
+{
+    new_note=$(echo -e "" | dmenu -p "Rename" $DMENU_ARGS)
+    $PYNOTES -r "$@" "$new_note"
+    show_notes 
+}
+
+###################################################################################################
+# remove_note function
+# takes 1(one) argument: the name of the element to remove.
+###################################################################################################
+remove_note()
+{
+    rm "$($PYNOTES -fp "$@")"
+    
+    show_notes 
+}
+
+###################################################################################################
+# note_selection function
+# takes 1(one) argument: the name of the element selected.
+# The function now uses DMENU to show some options to you.
+###################################################################################################
+note_selection()
+{
+    chosen="$@"
+    action=$(echo -e "[open]\n[rename]\n[delete]\n[back]" | dmenu -p "$chosen" $DMENU_ARGS)
+    case $action in
+        *"[open]"*)         xdg-open "$($PYNOTES -fp "$chosen")";;
+        *"[rename]"*)       rename_note "$chosen" ;;
+        *"[delete]"*)       remove_note "$chosen" ;;
+        *"[back]"*)         show_notes ;;
+    esac
+}
+
+###################################################################################################
+# show_notes function
+# Lists the notes
+###################################################################################################
+show_notes()
+{
+  actions="[add]"
+
+  echo -e $actions > $DMENU_ITEMS
+
+  $PYNOTES -l >> $DMENU_ITEMS
+
+  chosen=$(cat $DMENU_ITEMS | dmenu -p "Notes" $DMENU_ARGS)
+  
+  if grep -Fxq "$chosen" $DMENU_ITEMS
+  then 
+    case "$chosen" in
+      *"[add]"*)    todo=$(echo -e "" | dmenu -p "Add:" $DMENU_ARGS) ;  add_note "$chosen"; show_notes ;;
+      *)            note_selection "$chosen";;
+    esac
+  else
+    add_note "$chosen"
+  fi
+
+}
+
+###################################################################################################
+############################################## MAIN ###############################################
+###################################################################################################
+show_notes
