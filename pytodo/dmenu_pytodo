@@ -122,7 +122,7 @@ todo_selection()
 done_selection()
 {
   chosen=$1
-  action=$(echo -e "[undo]\n[edit]\n[back]" | dmenu -p "$chosen"py $DMENU_ARGS)
+  action=$(echo -e "[undo]\n[edit]\n[back]" | dmenu -p "$chosen" $DMENU_ARGS)
   case "$action" in
     *"[undo]"*)   mark_as_undone "$chosen" ;;
     *"[edit]"*)   xdg-open "$($PYTODO -fp "$chosen")" ;;
