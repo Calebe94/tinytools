@@ -7,21 +7,31 @@ import json
 
 PYCASH_CONFIG_FILE = os.path.join(
     os.getenv("HOME"), ".config", "pycash-config.json")
+
 PYCASH_CONFIG = {
     "file_path": os.path.join(os.getenv("HOME"), '.pycash'),
-    "currency": "$"
+    "currency": "$",
+    "date_format": '%Y-%m-%d'
 }
 
 DEFAULT_CSV_COLUMNS = "Type;Amount;Date;Description;Account;Category"
 
 
 def update_config():
+    # TODO: "Finish this function, it doesn't work yet!"
+    status = False
     if os.path.isfile(PYCASH_CONFIG_FILE):
         print("Consuming config from {}".format(PYCASH_CONFIG_FILE))
         with open(PYCASH_CONFIG_FILE, 'r') as config_file:
-            PYCASH_CONFIG = json.load(config_file)
+            AUX_PYCASH_CONFIG = json.load(config_file)
+            for x_values, y_values in zip(PYCASH_CONFIG.iteritems(), AUX_PYCASH_CONFIG.iteritems()):
+                if not (x_values == y_values):
+                    PYCASH_CONFIG[y_values[0].encode("utf-8")] = y_values[1].encode("utf-8")
+        status = True
     else:
         print("{} file does't exists!".format(PYCASH_CONFIG_FILE))
+
+    return status
 
 
 def get_file(arg_file):
@@ -53,6 +63,15 @@ def get_file(arg_file):
 
     return record_file
 
+def validate_date(date_string):
+    status = False
+    try:
+        datetime.datetime.strptime(date_string, '%Y-%m-%d')
+        status = True
+    except Exception as exception:
+        print("Incorrect data format, should be YYYY-MM-DD")
+
+    return status
 
 def get_date(arg_date):
     if arg_date == "today":
@@ -65,11 +84,93 @@ def get_date(arg_date):
         date = tomorrow.strftime('%Y-%m-%d')
     elif arg_date == None:
         date = datetime.datetime.now().strftime('%Y-%m-%d')
+    elif validate_date(arg_date) == False:
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
     else:
         date = arg_date
 
     return date
 
+def get_category(category):
+    return category if category != None else "Other"
+
+def add_entry(type, value, date, description, account, category, record_file):
+    pass
+
+def get_value_from_raw_entry(raw_splitted):
+    value = str(0)
+    try: # Try to access the index
+        value = raw_splitted[0].strip()
+    except Exception as identifier:
+        # If an exception was raised, get the default value(0)
+        print(identifier)
+
+    return value
+
+def get_date_from_raw_entry(raw_splitted):
+    date = str(0)
+    try: # Try to access the index
+        date = get_date(str(raw_splitted[1]).strip())
+    except Exception as identifier:
+        # If an exception was raised, get the default data(today)
+        date = get_date(date)
+        print(identifier)
+
+    return date
+
+def get_description_from_raw_entry(raw_splitted):
+    description = str("")
+    try: # Try to access the index
+        description = raw_splitted[2].strip()
+    except Exception as identifier:
+        # If an exception was raised, get the default description(empty)
+        print(identifier)
+
+    return description
+
+def get_account_from_raw_entry(raw_splitted):
+    account = str("")
+    try: # Try to access the index
+        account = raw_splitted[3].strip()
+    except Exception as identifier:
+        # If an exception was raised, get the default account(empty)
+        print(identifier)
+
+    account = account if account else "default"
+
+    return account
+
+
+def get_category_from_raw_entry(raw_splitted):
+    category = str("Other")
+    try: # Try to access the index
+        category = str(raw_splitted[4].strip())
+    except Exception as identifier:
+        # If an exception was raised, get the default category(empty)
+        print(identifier)
+
+    category = category if category else "Other"
+
+    return category
+
+def pase_raw_entry(type, raw_entry, record_file):
+    # subtitle:  type; currency value; date; description; account; category
+    line_entry = "{}; {} {}; {}; {}; {}; {}"
+    splited_raw_entry = raw_entry.split(";")
+    print(
+        line_entry.format(
+            type,
+            PYCASH_CONFIG['currency'],
+            get_value_from_raw_entry(splited_raw_entry),
+            get_date_from_raw_entry(splited_raw_entry),
+            get_description_from_raw_entry(splited_raw_entry),
+            get_account_from_raw_entry(splited_raw_entry),
+            get_category_from_raw_entry(splited_raw_entry),
+        )
+    )
+
+def add_raw_entry(entry, record_file):
+    pass
 
 def cli_arguments():
     parser = argparse.ArgumentParser()
@@ -79,7 +180,7 @@ def cli_arguments():
                         const='outcoming', required=False)
     parser.add_argument('--init', required=False, help="init")
     parser.add_argument('-r', '--raw', required=False, help="raw")
-    parser.add_argument('--value', required=True, help="value")
+    parser.add_argument('--value', required=False, help="value")
     parser.add_argument('--date', required=False, help="date")
     parser.add_argument('--account', required=False, help="account")
     parser.add_argument('--category', required=False, help="category")
@@ -89,16 +190,20 @@ def cli_arguments():
     args = parser.parse_args()
     update_config()
     if args.type:
-        type = args.type
-        value = args.value
-        date = get_date(args.date)
-        description = args.description
-        account = args.account
-        category = args.category if args.category != None else "Other"
-        finance_file = get_file(args.file)
-        print("Type;Amount;Date;Description;Account;Category")
-        print(type, value, date, description, account, category)
-
+        if args.raw:
+            pase_raw_entry(args.type, args.raw, args.file)
+        else:
+            if not args.value:
+                return -1
+            # type = args.type
+            # value = args.value
+            # date = get_date(args.date)
+            # description = args.description
+            # account = args.account
+            # category = args.category if args.category != None else "Other"
+            # finance_file = get_file(args.file)
+            # print("Type;Amount;Date;Description;Account;Category")
+            # print(type, value, date, description, account, category)
 
 def main():
     cli_arguments()
