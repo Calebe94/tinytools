@@ -181,7 +181,6 @@ def add_entry(entry, record_file_path):
 def parse_entry_by_arguments(type, value, description, date, account, category):
     return LINE_ENTRY.format(
         type,
-        # PYCASH_CONFIG['currency'],
         value,
         description,
         get_date(date),
@@ -194,7 +193,6 @@ def pase_raw_entry(type, raw_entry):
     splited_raw_entry = raw_entry.split(";")
     return LINE_ENTRY.format(
         type,
-        # PYCASH_CONFIG['currency'],
         get_value_from_raw_entry(splited_raw_entry),
         get_description_from_raw_entry(splited_raw_entry),
         get_date_from_raw_entry(splited_raw_entry),
@@ -240,8 +238,6 @@ def cli_arguments():
     parser.add_argument('--date', required=False, help="date")
     parser.add_argument('--account', required=False, help="account")
     parser.add_argument('--category', required=False, help="category")
-    parser.add_argument('--report', required=False, help="report", action='store_true')
-    parser.add_argument('--month', required=False, help="month", action='store_true')
     parser.add_argument('--file', required=False, help="file")
     parser.add_argument('-desc', '--description',
                         required=False, help="description")
@@ -267,10 +263,6 @@ def cli_arguments():
                 ),
                 get_file(args.file)
             )
-    elif args.report:
-        month_report()
-        if args.month:
-            print(args.report)
     else:
         parser.print_help()
         parser.exit()
