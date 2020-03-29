@@ -82,11 +82,11 @@ main()
 {
   (ls $LOG_FILE >> /dev/null 2>&1 && echo "$LOG_FILE Log file exists.") || (echo "Creating $LOG_FILE file..." && echo "PID;Title;Message;Timer Type;Time;Date Time" >> $LOG_FILE)
 
-  echo "$$;$TITLE;$START_MESSAGE;$TIMER_TYPE;$TIME;$(date +%s)" >> $LOG_FILE
+  echo "$$;$TITLE;$START_MESSAGE;$TIMER_TYPE;$TIME;$(date)" >> $LOG_FILE
   notify "$TITLE" "$START_MESSAGE"
   ticker
   notify "$TITLE" "$STOP_MESSAGE"
-  echo "$$;$TITLE;$STOP_MESSAGE;$TIMER_TYPE;$TIME;$(date +%s)" >> $LOG_FILE
+  echo "$$;$TITLE;$STOP_MESSAGE;$TIMER_TYPE;$TIME;$(date)" >> $LOG_FILE
   beep
 }
 
