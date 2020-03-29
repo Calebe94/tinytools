@@ -1,4 +1,4 @@
-#/bin/sh
+#/bin/zsh
 # Command example
 # sleep 1 && terminal-notifier -message "Para de Estudar" -title "Pomodoro" && afplay /System/Library/Sounds/Glass.aiff
 
@@ -41,6 +41,9 @@ STOP_MESSAGE="Stop working"
 # and then it switches to rest.
 TIMER_TYPE="work"
 
+VERBOSE=false
+DISPLAY_TIME=false
+
 ####################
 # GLOBAL FUNCTIONS #
 ####################
@@ -58,14 +61,22 @@ beep()
   $PLAY $BEEP
 }
 
+convertsecs() {
+  ((h=${1}/3600))
+  ((m=(${1}%3600)/60))
+  ((s=${1}%60))
+  printf "%02d:%02d:%02d"\\r $h $m $s
+}
+
 # Ticker function
 ticker()
 {
   TIME_TO_SLEEP=$(echo "$TIME*60"|bc)
-  echo "Time to $TIMER_TYPE..."
-  echo "Sleeping for $TIME_TO_SLEEP..."
-
-  $SLEEP $TIME_TO_SLEEP
+  ( $VERBOSE && echo "Time to $TIMER_TYPE..." && echo "Sleeping for $TIME_TO_SLEEP..." )
+  for index in $(seq 1 $TIME_TO_SLEEP); do
+    ( $DISPLAY_TIME && convertsecs $index )
+    sleep 1
+  done
 }
 
 usage()
@@ -76,11 +87,19 @@ usage()
   echo "-s: start to study"
   echo "-w: start to work"
   echo "-t: set the timer (in minutes)"
+  echo "-v: verbose"
+  echo "-d: Display elapsed time"
 }
 
 main()
 {
-  (ls $LOG_FILE >> /dev/null 2>&1 && echo "$LOG_FILE Log file exists.") || (echo "Creating $LOG_FILE file..." && echo "PID;Title;Message;Timer Type;Time;Date Time" >> $LOG_FILE)
+  AUX_LOG_FILE=$(ls $LOG_FILE)
+
+  if [[ $AUX_LOG_FILE ]]; then
+    ($VERBOSE && echo "$LOG_FILE Log file exists.")
+  else
+    ($VERBOSE && echo "Creating $LOG_FILE file..." && echo "PID;Title;Message;Timer Type;Time;Date Time" >> $LOG_FILE)
+  fi
 
   echo "$$;$TITLE;$START_MESSAGE;$TIMER_TYPE;$TIME;$(date)" >> $LOG_FILE
   notify "$TITLE" "$START_MESSAGE"
@@ -94,7 +113,7 @@ main()
 # STARTS SCRIPT #
 #################
 
-while getopts "hwsrt:" args; do
+while getopts "hwsrvdt:" args; do
   case "${args}" in
     w)
       TIMER_TYPE="work"
@@ -116,9 +135,11 @@ while getopts "hwsrt:" args; do
     t)
       TIME=${OPTARG}
       ;;
-    h)
-      usage
-      exit 0
+    v)
+      VERBOSE=true
+      ;;
+    d)
+      DISPLAY_TIME=true
       ;;
     h | *)
       usage

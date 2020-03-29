@@ -44,6 +44,26 @@ And what if you want to clone your terminal? Well... you can use [**nohup**](htt
 $ nohup pomodoro -r -t 10 &
 ```
 
+You can display the elapsed time by running the folling command:
+
+```
+$ # Replace the $$ with the pomodoro PID
+$ ps -p $$ -o etime
+```
+
+If you want to keep tracking the elapsed time you can do the follow command:
+
+```
+$ # Replace the $$ with the pomodoro PID
+$ while true; do sleep 1 && echo -ne "$(ps -p $$ -o etime="")\r"; done
+```
+
+If you want to automatically track if **pomodoro** is running, you can do it by searching its **PID**.
+
+```
+$ ps -fu $USER| grep "sh ./pomodoro" | grep -v "grep" | awk '{print $2}'
+```
+
 # Team
 
 | <img src="https://github.com/Calebe94.png?size=200" alt="Edimar Calebe Castanho"> | <img src="https://github.com/gbgabo.png?size=200" alt="Gabriel Gaboardi"> | 
