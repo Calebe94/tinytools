@@ -38,6 +38,12 @@ Or you can use a for loop:
 $ for i in {1..5}; do ./pomodoro -w -t 25 && ./pomodoro -r -t 5; done
 ```
 
+And what if you want to clone your terminal? Well... you can use [**nohup**](https://www.computerhope.com/unix/unohup.htm) to inform the system to continue running it.
+
+```
+$ nohup pomodoro -r -t 10 &
+```
+
 # Team
 
 | <img src="https://github.com/Calebe94.png?size=200" alt="Edimar Calebe Castanho"> | <img src="https://github.com/gbgabo.png?size=200" alt="Gabriel Gaboardi"> | 
