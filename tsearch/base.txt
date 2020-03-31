@@ -1,0 +1,34 @@
+tsearch --program --engine --term
+
+PROGRAM
+- chrome
+- qute
+- firefox
+- terminal
+
+ENGINE
+- youtube
+- wikipedia
+- duck
+- google
+- www
+
+- package repos
+    - apt
+    - pacman
+    - AUR
+
+if WEB
+    term = create_query(engine, term)
+
+
+search(browser, term)
+
+
+
+OPTION
+- private
+    --private-window
+    --incognito
+
+
