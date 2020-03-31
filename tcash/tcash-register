@@ -9,11 +9,11 @@ import csv
 import re
 
 PYCASH_CONFIG_FILE = os.path.join(
-    os.getenv("HOME"), ".config", "pycash-config.json")
+    os.getenv("HOME"), ".config", "tcash-config.json")
 
 # Default configuration
 PYCASH_CONFIG = {
-    "file_path": os.path.join(os.getenv("HOME"), '.pycash'),
+    "file_path": os.path.join(os.getenv("HOME"), '.tcash'),
     "currency": "$",
     "date_format": '%Y-%m-%d'
 }
@@ -273,7 +273,7 @@ def main():
 
 if __name__ == "__main__":
     logging.basicConfig(
-        filename=os.path.join('/tmp', 'pycash.log'),
+        filename=os.path.join('/tmp', 'tcash.log'),
         level=logging.DEBUG,
         format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S'
     )
