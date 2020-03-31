@@ -1,4 +1,4 @@
-# pynotes
+# tnotes
 
 A simple dmenu wrapper to create and access your Markdown notes.
 
