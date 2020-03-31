@@ -1,0 +1,151 @@
+#/bin/zsh
+# Command example
+# sleep 1 && terminal-notifier -message "Para de Estudar" -title "Pomodoro" && afplay /System/Library/Sounds/Glass.aiff
+
+####################
+# GLOBAL VARIABLES #
+####################
+
+# TITLE
+TITLE="Pomodoro"
+
+# Pomodoro log file path
+LOG_FILE=$HOME/pomodoro.log
+
+# BEEP is a sound that will be emitted when timer runs out of time
+BEEP="/System/Library/Sounds/Glass.aiff"
+
+# PLAY is a package to run the beep sound.
+PLAY=afplay
+
+# NOTIFIER package
+NOTIFIER=terminal-notifier
+
+# SLEEP Command
+SLEEP=sleep
+
+# Default work/study time
+WORK_TIME=25
+
+#Default rest time
+REST_TIME=5
+
+# Defalt time is work
+TIME=$WORK_TIME
+
+# Default start/stop work message
+START_MESSAGE="Start to work"
+STOP_MESSAGE="Stop working"
+
+# Default type, when the scripts starts it'll start the work task first
+# and then it switches to rest.
+TIMER_TYPE="work"
+
+VERBOSE=false
+DISPLAY_TIME=false
+
+####################
+# GLOBAL FUNCTIONS #
+####################
+
+# This function is responsible to notify the user when ticker time is over.
+# You can change this function to do whatever you want.
+notify()
+{
+  $NOTIFIER -title "$1" -message "$2" -activate com.apple.iterm2
+}
+
+# This function is responsible to play a beep to notify the user when the ticker is over.
+beep()
+{
+  $PLAY $BEEP
+}
+
+convertsecs() {
+  ((h=${1}/3600))
+  ((m=(${1}%3600)/60))
+  ((s=${1}%60))
+  printf "%02d:%02d:%02d"\\r $h $m $s
+}
+
+# Ticker function
+ticker()
+{
+  TIME_TO_SLEEP=$(echo "$TIME*60"|bc)
+  ( $VERBOSE && echo "Time to $TIMER_TYPE..." && echo "Sleeping for $TIME_TO_SLEEP..." )
+  for index in $(seq 1 $TIME_TO_SLEEP); do
+    ( $DISPLAY_TIME && convertsecs $index )
+    sleep 1
+  done
+}
+
+usage()
+{
+  echo "usage: pomodoro [-r] [-w] [-s] [-t <value>]"
+  echo "options:"
+  echo "-r: start to rest"
+  echo "-s: start to study"
+  echo "-w: start to work"
+  echo "-t: set the timer (in minutes)"
+  echo "-v: verbose"
+  echo "-d: Display elapsed time"
+}
+
+main()
+{
+  AUX_LOG_FILE=$(ls $LOG_FILE)
+
+  if [[ $AUX_LOG_FILE ]]; then
+    ($VERBOSE && echo "$LOG_FILE Log file exists.")
+  else
+    ($VERBOSE && echo "Creating $LOG_FILE file..." && echo "PID;Title;Message;Timer Type;Time;Date Time" >> $LOG_FILE)
+  fi
+
+  echo "$$;$TITLE;$START_MESSAGE;$TIMER_TYPE;$TIME;$(date)" >> $LOG_FILE
+  notify "$TITLE" "$START_MESSAGE"
+  ticker
+  notify "$TITLE" "$STOP_MESSAGE"
+  echo "$$;$TITLE;$STOP_MESSAGE;$TIMER_TYPE;$TIME;$(date)" >> $LOG_FILE
+  beep
+}
+
+#################
+# STARTS SCRIPT #
+#################
+
+while getopts "hwsrvdt:" args; do
+  case "${args}" in
+    w)
+      TIMER_TYPE="work"
+      TIME=$WORK_TIME
+      # Use default message
+      ;;
+    s)
+      TIMER_TYPE="study"
+      TIME=$WORK_TIME
+      START_MESSAGE="Start to study"
+      STOP_MESSAGE="Stop to study"
+      ;;
+    r)
+      TIMER_TYPE="rest"
+      TIME=$REST_TIME
+      START_MESSAGE="Let's get some rest"
+      STOP_MESSAGE="Go back to your duty"
+      ;;
+    t)
+      TIME=${OPTARG}
+      ;;
+    v)
+      VERBOSE=true
+      ;;
+    d)
+      DISPLAY_TIME=true
+      ;;
+    h | *)
+      usage
+      exit 0
+      ;;
+  esac
+done
+
+main
