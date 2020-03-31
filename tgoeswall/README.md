@@ -1,4 +1,4 @@
-# GOES Dynamic Wallpaper
+# Tiny GOES Dynamic Wallpaper
 
 I'm using [GOES](https://www.star.nesdis.noaa.gov/GOES/) images to be my wallpaper, such as macOS Mojave's dynamic wallpaper.
 
