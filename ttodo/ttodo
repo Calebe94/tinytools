@@ -6,7 +6,7 @@ import argparse
 import datetime
 import shutil
 
-TODO_FOLDER = os.path.join(os.getenv('HOME'), '.pytodo')
+TODO_FOLDER = os.path.join(os.getenv('HOME'), '.ttodo')
 YAML = '---\nname: "{0}"\ncreated: "{1}"\ndone: {2}\n---'
 
 # ===================================================================================================

@@ -1,4 +1,4 @@
-# pytodo
+# ttodo
 
 A simple dmenu wrapper to create and access your todo list.
 
