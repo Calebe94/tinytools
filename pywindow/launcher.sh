@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PYWINDOW=$HOME/Scripts/pytools/pywindow/pywindow.py
 
