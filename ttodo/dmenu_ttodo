@@ -5,7 +5,7 @@
 ####################################################################################################
 DMENU_ITEMS="/tmp/dmenu_items"
 DMENU_ARGS=$@
-PYTODO=$HOME/.scripts/pytodo
+PYTODO=$HOME/.scripts/ttodo
 
 ###################################################################################################
 # add_note function
@@ -14,7 +14,7 @@ PYTODO=$HOME/.scripts/pytodo
 add_note()
 {
   echo "Add Note"
-  $HOME/.scripts/pytodo -a "$1"
+  $HOME/.scripts/ttodo -a "$1"
 }
 
 ###################################################################################################
@@ -59,7 +59,7 @@ list_done()
 
   echo -e $actions > $DMENU_ITEMS
 
-  $HOME/.scripts/pytodo -ld >> $DMENU_ITEMS
+  $HOME/.scripts/ttodo -ld >> $DMENU_ITEMS
 
   chosen=$(cat $DMENU_ITEMS | dmenu -p "Done" $DMENU_ARGS)
 
@@ -82,7 +82,7 @@ list_todo()
 
   echo -e $actions > $DMENU_ITEMS
 
-  $HOME/.scripts/pytodo -lt >> $DMENU_ITEMS
+  $HOME/.scripts/ttodo -lt >> $DMENU_ITEMS
 
   chosen=$(cat $DMENU_ITEMS | dmenu -p "Todo" $DMENU_ARGS)
 
