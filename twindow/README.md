@@ -1,4 +1,4 @@
-# pywindow
+# twindow
 A simple python script using dmenu and i3ipc module to list all opened windows in i3wm and be able to focus on the one selected.
 
 ## Dependencies
@@ -15,16 +15,24 @@ Since it was initially designed to work with dmenu, it's highly suggested for yo
 ### Command Line Interface
 For the default listing (list opened windows in all workspaces), run:
 ```
-./windowSwitch.py
+./twindow.py
 ```
 You can also list the opened windows only in the current workspace:
 ```
-./windowSwitch.py -w
+./twindow.py -c
+```
+To list the opened workspaces:
+```
+./twindow.py -w
+```
+And to simply show the current workspace you are in, run:
+```
+./twindow.py -c -w
 ```
 
 To focus on a specific window:
 ```
-./windowSwitch.py -f WINDOW_NAME
+./twindow.py -f WINDOW_NAME
 ```
 
 ### dmenu Interface
