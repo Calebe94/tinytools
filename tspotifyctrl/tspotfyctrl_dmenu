@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Dependency: 
+# * spotify: https://www.spotify.com/br/
+# * spotify-cli: https://github.com/pwittchen/spotify-cli-linux
+#     - You should also install spotify-cli with sudo: sudo pip install spotify-cli-linux
+
+# Spotify client
+SERVICE="spotify"
+
+# We cant get what is playing by:
+# spotify-cli --statusshort
+NOW_PLAYING=""
+
+echo $@
+dmenu_main()
+{ 
+  NOW_PLAYING=$(spotifycli --statusshort)
+  CHOSEN=$(echo -e "previous\nplay/pause\nnext" | dmenu $@ -p "$NOW_PLAYING")
+  echo $CHOSEN
+  if [[ "$CHOSEN" == "previous" ]]; then
+    spotifycli --prev
+  elif [[ "$CHOSEN" == "play/pause" ]]; then
+    spotifycli --playpause
+  elif [[ "$CHOSEN" == "next" ]]; then
+    spotifycli --next
+  else
+    spotifycli --help
+  fi
+}
+
+if pgrep -x "$SERVICE" >/dev/null
+then
+  echo "$SERVICE is running"
+  dmenu_main
+else
+  # If spotify is not running, start it.
+  echo "$SERVICE was not running"
+  spotify &
+  dmenu_main
+fi
+
+
