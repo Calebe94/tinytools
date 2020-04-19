@@ -2,9 +2,14 @@
 
 # Indexes
 
-* [pymenu - Under Development.](pymenu/README.md)
-* [pynotes - Under Development.](pynotes/README.md)
-* [pytodo - Under Development.](pytodo/README.md)
+* [tcash - .](tcash/README.md)
+* [tgoeswall - .](tgoeswall/README.md)
+* [tmenu - .](tmenu/README.md)
+* [tnotes - .](tnotes/README.md)
+* [tpomodoro - .](tpomodoro/README.md)
+* [tsearch - .](tsearch/README.md)
+* [ttodo - .](ttdodo/README.md)
+* [twindow - .](twindow/README.md)
 
 # Team
 
