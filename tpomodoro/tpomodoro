@@ -82,10 +82,10 @@ beep()
   # This script is meant to be used only on MacOS or Linux
   if [[ "$(uname -s)" -eq "Linux" ]]; then
     # Script is running on Linux
-    $PLAY_LINUX -nodisp -autoexit $BEEP_LINUX >/dev/null 2>&1
+    $PLAYER_LINUX -nodisp -autoexit $BEEP_LINUX >/dev/null 2>&1
   else 
     # Script is running on MacOS
-   $PLAY_MAC $BEEP_MAC
+   $PLAYER_MAC $BEEP_MAC
   fi
 
 }
