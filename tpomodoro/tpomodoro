@@ -33,7 +33,7 @@ PLAYER_LINUX=ffplay
 NOTIFIER_LINUX=notify-send
 
 # BEEP is a sound that will be emitted when timer runs out of time
-BEEP_LINUX="usr/share/sounds/tpomodoro/Notification.mp3"
+BEEP_LINUX="/usr/share/sounds/tpomodoro/Notification.mp3"
 
 # SLEEP Command
 SLEEP=sleep
