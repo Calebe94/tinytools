@@ -1,38 +1,20 @@
 #!/bin/bash
 
-LIST=$1
-YAML_PARSER=$HOME/.dotfiles/scripts/dmenu-builder/parse_yaml.sh
+list=$1
+yaml_parser=$HOME/Scripts/pytools/tyaml/parse_yaml.sh
 
-function parse_yaml {
-   local prefix=$2
-   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-   sed -ne "s|^\($s\):|\1|" \
-        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
-   awk -F$fs '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"##", "'$prefix'",vn, $2, $3);
-      }
-   }'
-}
+#get yaml values
+parsed_yaml=$($yaml_parser $list)
 
-# RAW_YAML=$(parse_yaml $LIST)
-# PARSED_YAML=${RAW_YAML//##/\\n} #Certifica queba de linha
-# echo -e $PARSED_YAML
+prompt=$(echo -e "$parsed_yaml"| awk -F= '/^prompt/{print $NF}')
+options=$(echo -e "$parsed_yaml" | awk -F_ '/option/{print $2}')
 
-PARSED_YAML=$($YAML_PARSER $LIST)
-echo -e $PARSED_YAML
+#list options on dmenu and return chosen option
+dmenu_chosen=$(echo -e "$options" | dmenu -i -fn "undefined" -p "$prompt")
 
-PROMPT=$(awk -F": " '/^prompt/{print $NF}' $LIST)
-choices=$(echo -e $PARSED_YAML | awk -F_ '/option/{print $2}')
+#get the especific command related to chosen option
+chosen_command=$(echo -e "$parsed_yaml" | awk -v chosen="$dmenu_chosen" -F= '/'"$dmenu_chosen"'/{print $NF}')
 
-chosen=$(echo -e "$choices" | dmenu -i -fn "undefined" -p "$PROMPT")
-
-RESULT=$(echo -e $PARSED_YAML | awk -v chosen="$chosen" -F= '/'"$chosen"'/{print $NF}')
-
-COMMAND=${RESULT//'"'}
-$COMMAND
+#execute chosen item command
+parsed_command=${chosen_command//'"'}
+$parsed_command
