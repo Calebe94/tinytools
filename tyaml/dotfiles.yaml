@@ -1,0 +1,9 @@
+prompt: dotfiles
+option:
+  vim:
+    command: code /home/gabo/.vimrc
+  bash:
+    command: code /home/gabo/.bashrc
+  i3:
+    command: code /home/gabo/.i3/config
+

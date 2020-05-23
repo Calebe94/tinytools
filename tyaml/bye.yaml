@@ -1,0 +1,13 @@
+prompt: Leaving?
+option:
+  Lock:
+    command: blurlock
+  Restart:
+    command: reboot
+  Shutdown:
+    command: shutdown -h now
+  Exit:
+    command: i3-msg exit
+  
+
+ 
