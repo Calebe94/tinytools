@@ -7,6 +7,7 @@ yaml_parser=$HOME/Scripts/pytools/tyaml/parse_yaml.sh
 parsed_yaml=$($yaml_parser $list)
 
 prompt=$(echo -e "$parsed_yaml"| awk -F= '/^prompt/{print $NF}')
+prompt=${prompt//'"'}
 options=$(echo -e "$parsed_yaml" | awk -F_ '/option/{print $2}')
 
 #list options on dmenu and return chosen option
@@ -14,7 +15,6 @@ dmenu_chosen=$(echo -e "$options" | dmenu -i -fn "undefined" -p "$prompt")
 
 #get the especific command related to chosen option
 chosen_command=$(echo -e "$parsed_yaml" | awk -v chosen="$dmenu_chosen" -F= '/'"$dmenu_chosen"'/{print $NF}')
+chosen_command=${chosen_command//'"'}
 
-#execute chosen item command
-parsed_command=${chosen_command//'"'}
-$parsed_command
+$chosen_command
