@@ -14,7 +14,7 @@ options=$(echo -e "$parsed_yaml" | awk -F_ '/option/{print $2}')
 dmenu_chosen=$(echo -e "$options" | dmenu -i -fn "undefined" -p "$prompt")
 
 #get the especific command related to chosen option
-chosen_command=$(echo -e "$parsed_yaml" | awk -v chosen="$dmenu_chosen" -F= '/'"$dmenu_chosen"'/{print $NF}')
+chosen_command=$(echo -e "$parsed_yaml" | awk -F= '/'"$dmenu_chosen"'/{print $NF}')
 chosen_command=${chosen_command//'"'}
 
 $chosen_command

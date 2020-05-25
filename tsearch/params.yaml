@@ -1,0 +1,29 @@
+default:
+  engine: google
+  program: firefox
+
+engine:
+  google:
+    query: https://www.google.com/search?q=TERM
+  youtube:
+    query: https://www.youtube.com/results?search_query=TERM
+  duckduckgo:
+    query: https://www.duckduckgo.com/?q=TERM
+  netflix:
+    query: https://www.netflix.com/search?q=TERM
+  stack-overflow:
+    query: https://stackoverflow.com/search?q=TERM
+  google-maps:
+    query: https://www.google.com/maps/search/TERM
+  translate:
+    query: https://translate.google.com/?sl=auto&tl=$LANG&text=TERM
+  reddit:
+    query: https://www.reddit.com/search/?q=TERM
+
+program:
+  firefox:
+    command: firefox
+  qutebrowser:
+    command: qutebrowser
+  chrome:
+    command: google-chrome-stable
