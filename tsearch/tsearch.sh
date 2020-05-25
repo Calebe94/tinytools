@@ -1,11 +1,10 @@
 #!/bin/bash 
 
-search_params=~/Scripts/pytools/tsearch/params.yaml
+search_params=$HOME/Scripts/pytools/tsearch/params.yaml
+parse=$HOME/Scripts/pytools/tyaml/parse_yaml.sh
 
-yaml_parser=$HOME/Scripts/pytools/tyaml/parse_yaml.sh
-
-program=$($yaml_parser $search_params default_program)
-engine=$($yaml_parser $search_params default_engine)
+program=$($parse $search_params default.program)
+engine=$($parse $search_params default.engine)
 lang="en"
 
 while getopts p:e:t:l option
@@ -22,13 +21,9 @@ done
 term=${raw_term// /+}
 
 get_query(){
-    query=$($yaml_parser $search_params "$engine"_query)
+    query=$($parse $search_params "$engine".query)
     echo "${query/TERM/$term}"
 }
 
-command=$($yaml_parser $search_params "$program"_command)
-
-# case "$engine" in
-    # pacman | apt | aur) $(create_query $ENGINE) ;;
-    $command $(get_query $engine)
-# esac
+command=$($parse $search_params "$program".command)
+$command $(get_query $engine)

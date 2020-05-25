@@ -1,18 +1,6 @@
 #!/bin/bash 
 
-path=''
-prefix=''
-
-# while getopts g:p option
-# do
-# case "${option}"
-# in
-# g) path=${OPTARG};;
-# p) prefix=${OPTARG};;
-# esac
-# done
-
-parse_yaml(){
+get_paths(){
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
    sed -ne "s|^\($s\):|\1|" \
@@ -23,23 +11,34 @@ parse_yaml(){
       vname[indent] = $2;
       for (i in vname) {if (i > indent) {delete vname[i]}}
       if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])(".")}
          printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
       }
    }'
 }
 
-parsed_yaml=$(parse_yaml $1)
-
 get_value(){
-    local yaml_file=$1
-    local path=$2
-    local value=$(echo -e "$yaml_file" | awk -F\" '/'$path'/{print $2}')
-    echo $value
+   local paths=$1
+   local path=$2
+   local value=$(echo -e "$paths" | awk -F\" '/'$path'/{print $2}')
+   echo $value
 }
 
+get_keys(){
+   local paths=$1
+   local path=$2
+   local keys=$(echo -e "$paths" | awk -F. '/'$path'/{print $2}')
+   echo $keys
+}
+
+yaml_paths=$(get_paths $1)
+
 if [ -n "$2" ]; then
-   echo $(get_value "$parsed_yaml" $2)
+   if [ $2 == '-k' ]; then
+      echo $(get_keys "$yaml_paths" $3)
+   else
+      echo $(get_value "$yaml_paths" $2)
+   fi
 else
-   echo -e "$parsed_yaml"
+   echo -e "$yaml_paths"
 fi
