@@ -1,16 +1,18 @@
 #!/bin/bash
 
 TSEARCH=$HOME/Scripts/pytools/tsearch/tsearch.sh
-CONFIG=~/Scripts/pytools/tsearch/list.config
+parse=$HOME/Scripts/pytools/tyaml/parse_yaml.sh
 
-ENGINE_OPTION="[*] CHANGE ENGINE"
-PROGRAM_OPTION="[*] CHANGE PROGRAM"
+CONFIG=$HOME/Scripts/pytools/tsearch/params.yaml
+
+ENGINE_OPTION=">> CHANGE ENGINE"
+PROGRAM_OPTION=">> CHANGE PROGRAM"
 CLIP_OPTION=$(xclip -selection c -o)
 
-ENGINE_CHOICES=$(awk '/^engine/{print $2}' $CONFIG)
-PROGRAM_CHOICES=$(awk '/^program/{print $2}' $CONFIG)
+ENGINE_CHOICES=$($parse $CONFIG -k engine)
+PROGRAM_CHOICES=$($parse $CONFIG -k program)
 
-PROMPT=$(awk '/^default/ && $2=="engine" {print $3}' $CONFIG)
+PROMPT=$($parse $CONFIG default.engine)
 COMMAND=$TSEARCH
 IS_SPECIAL_INPUT=1
 

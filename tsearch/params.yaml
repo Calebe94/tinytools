@@ -11,9 +11,9 @@ engine:
     query: https://www.duckduckgo.com/?q=TERM
   netflix:
     query: https://www.netflix.com/search?q=TERM
-  stack-overflow:
+  stack_overflow:
     query: https://stackoverflow.com/search?q=TERM
-  google-maps:
+  google_maps:
     query: https://www.google.com/maps/search/TERM
   translate:
     query: https://translate.google.com/?sl=auto&tl=$LANG&text=TERM
