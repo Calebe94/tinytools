@@ -27,17 +27,17 @@ get_value(){
 get_keys(){
    local paths=$1
    local path=$2
-   local keys=$(echo -e "$paths" | awk -F. '/'$path'/{print $2}')
-   echo $keys
+   local matched_paths=$(echo -e "$paths" | awk '/^'$path'/{print $0}' | awk -F"$path". '{print $2}' | awk -F. '{print $1}' | awk -F= '{print $1}')
+   echo -e "$matched_paths"
 }
 
 yaml_paths=$(get_paths $1)
 
 if [ -n "$2" ]; then
    if [ $2 == '-k' ]; then
-      echo $(get_keys "$yaml_paths" $3)
+      echo -e "$(get_keys "$yaml_paths" $3)"
    else
-      echo $(get_value "$yaml_paths" $2)
+      echo -e "$(get_value "$yaml_paths" $2)"
    fi
 else
    echo -e "$yaml_paths"

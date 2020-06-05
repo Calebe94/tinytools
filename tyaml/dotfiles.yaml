@@ -7,5 +7,6 @@ option:
   i3:
     command: code /home/gabo/.i3/config
   userChrome:
-    command: code /home/gabo/.mozilla/firefox/9lkm9tdr.default/chrome
+    command: pcmanfm /home/gabo/.mozilla/firefox/9lkm9tdr.default/chrome
+    
 
