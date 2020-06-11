@@ -18,4 +18,43 @@ function tyaml_parser
    }'
 }
 
-[ ! -z $1 ] && tyaml_parser $1
+get_value()
+{
+   local file=$1
+   local path=$2
+   tyaml_parser $file | awk -F : '/'$path'/{print $2}'
+}
+
+get_keys()
+{
+   local file=$1
+   local path=$2
+   tyaml_parser $file | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $0}' | awk -F : '{print $1}'
+}
+
+usage()
+{
+   echo "usage: tyaml FILE [-k] [-v] argument"
+   echo "options:"
+   echo "-k: get yaml keys"
+   echo "-v: get yaml values"
+   echo "example:"
+   echo "$ tyaml file.yaml -k option1.values"
+}
+
+if [ -n "$2" ]; then
+   case "$2" in
+      "-v")
+         get_value $1 $3
+         ;;
+      "-k")
+         get_keys $1 $3
+         ;;
+      "-h" | *)
+         usage
+         exit 0
+         ;;
+   esac
+else
+   tyaml_parser $1
+fi
