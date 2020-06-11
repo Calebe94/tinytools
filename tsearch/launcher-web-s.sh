@@ -1,11 +1,11 @@
 #!/bin/sh
 
-TSEARCH=$HOME/Scripts/pytools/tsearch/tsearch.sh
+tsearch=$HOME/Scripts/pytools/tsearch/tsearch.sh
 
-CLIP_OPTION=$(xclip -selection c -o)
+clip_option=$(xclip -selection c -o)
 
-TERM=$(echo $CLIP_OPTION | dmenu -p "Search:" -i)
+term=$(echo $clip_option | dmenu -p "Search:" -i)
 
-if [ -n "$TERM" ]; then
-    $TSEARCH -t "$TERM"
+if [ -n "$term" ]; then
+    $tsearch -t "$term"
 fi
