@@ -1,0 +1,16 @@
+Menu:
+  cancel: null
+  run: dmenu_run_history -p 'run' -fn 'size=12' -sb '#BD93F9' -sf '#f3f4f5' -nf '#f3f4f5' -nb '#1c1f25'
+  calc: $HOME/.scripts/menu-calc/=
+  ranger: st ranger
+  qutebrowser: qutebrowser
+  discord: discord
+  codium: codium
+  spotify: $HOME/.scripts/tspotfyctrl_dmenu
+  notes: $HOME/.scripts/dmenu/dmenu_pynotes -fn 'size=12' -sb '#BD93F9' -sf '#f3f4f5' -nf '#f3f4f5' -nb '#1c1f25'
+  todo: $HOME/.scripts/dmenu/dmenu_pytodo -fn 'size=12' -sb '#BD93F9' -sf '#f3f4f5' -nf '#f3f4f5' -nb '#1c1f25'
+  bookmarks: $HOME/.scripts/dmenu/dmenu_buku -fn 'size=12' -sb '#BD93F9' -sf '#f3f4f5' -nf '#f3f4f5' -nb '#1c1f25'
+  wifi: st nmtui
+  settings: xfce4-settings-manager
+  passwords: $HOME/.config/i3/scripts/passmenu -fn 'size=12' -sb '#BD93F9' -sf '#f3f4f5' -nf '#f3f4f5' -nb '#1c1f25'
+  reboot: echo -e "no\nyes" | dmenu -p "reboot?" | {read sel; test "$sel" = "yes" && echo "reboot"}
