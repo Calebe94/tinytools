@@ -1,0 +1,43 @@
+#!/bin/bash 
+
+search_params=$HOME/Scripts/pytools/tsearch/params.yaml
+parse=$HOME/Scripts/pytools/tyaml/tyaml
+
+program=$($parse $search_params -v default.program)
+engine=$($parse $search_params -v default.engine)
+lang="en"
+
+usage()
+{
+   echo "usage: tsearch -t \"term\" [-e] engine [-p] program"
+   echo "options:"
+   echo "-t: term to search"
+   echo "-e: set search engine"
+   echo "-p: set parogram to launch"
+   echo "example:"
+   echo "$ tsearch -t \"free software\" -e duckduckgo -p firefox"
+#    echo "engines available"
+#    echo "$($parse $search_params -k engine)
+}
+
+while getopts p:e:t:l:h option
+do
+case "${option}"
+in
+p) program=${OPTARG};;
+e) engine=${OPTARG};;
+t) raw_term=${OPTARG};;
+l) lang=${OPTARG};; 
+h) usage;;
+esac
+done
+
+term=${raw_term// /+}
+
+get_query(){
+    query=$($parse $search_params -v engine."$1".query)
+    echo "${query/TERM/$term}"
+}
+
+command=$($parse $search_params -v program."$program".command)
+$command $(get_query $engine)
