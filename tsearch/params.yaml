@@ -1,7 +1,11 @@
+# Default values for engine and program of search
+# The name of the engine/program needs to be exactly as declared on the listing next below
 default:
-  engine: google
+  engine: duckduckgo
   program: firefox
 
+# To add another engine, follow the structure of engine_name and query
+# Declare where the search term needs to be in the URL by putting the word TERM
 engine:
   google:
     query: https://www.google.com/search?q=TERM
@@ -19,6 +23,8 @@ engine:
     query: https://translate.google.com/?sl=auto&tl=$LANG&text=TERM
   reddit:
     query: https://www.reddit.com/search/?q=TERM
+  twitter:
+    query: https://twitter.com/search?q=TERM
 
 program:
   firefox:
