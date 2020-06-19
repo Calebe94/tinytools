@@ -33,3 +33,5 @@ program:
     command: qutebrowser
   chrome:
     command: google-chrome-stable
+  curl:
+    command: curl
