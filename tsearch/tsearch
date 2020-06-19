@@ -8,13 +8,15 @@ engine=$($parse $search_params -v default.engine)
 lang="en"
 
 usage(){
-   echo -e "\033[1musage:\033[0m tsearch -t \"term\" [-e] engine [-p] program"
+   echo -e "\033[1musage:\033[0m"
+   echo -e "$ tsearch -t \"term\" [-e] engine [-p] program"
    echo -e "\033[1moptions:\033[0m"
    echo -e "\033[1m-t:\033[0m term to search"
    echo -e "\033[1m-e:\033[0m set search engine"
    echo -e "\033[1m-p:\033[0m set program to launch"
+   echo -e  "\033[1m-l <engine|program>:\033[0m list engines/programs available"
    echo -e "\033[1mexample:\033[0m"
-   echo -e "$ tsearch -t \"free software\" -e duckduckgo -p firefox"
+   echo -e "\033[1m$\033[0m tsearch -t \"free software\" -e duckduckgo -p firefox"
 #    echo "engines available"
 #    echo "$($parse $search_params -k engine)
 }
@@ -36,19 +38,17 @@ url_encode(){
     LC_COLLATE=$old_lc_collate
 }
 
-while getopts p:e:t:l:h option
+while getopts p:e:t:hl: option
 do
 case "${option}"
 in
 p) program=${OPTARG};;
 e) engine=${OPTARG};;
-t) raw_term=${OPTARG};;
-l) lang=${OPTARG};; 
+t) term=$(url_encode "${OPTARG}");; 
 h) usage;;
+l) echo -e "$($parse $search_params -k "${OPTARG}")";;
 esac
 done
-
-term=$(url_encode "$raw_term")
 
 get_query(){
     query=$($parse $search_params -v engine."$1".query)
