@@ -22,14 +22,14 @@ get_value()
 {
    local file=$1
    local path=$2
-   tyaml_parser $file | awk -F : '/'$path'/{print $2}'
+   tyaml_parser $file | awk '/^'$path':/{print $0}' | awk -F "$path". '{print $2}'
 }
 
 get_keys()
 {
    local file=$1
    local path=$2
-   tyaml_parser $file | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $0}' | awk -F : '{print $1}'
+   tyaml_parser $file | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}' | awk -F : '{print $1}'
 }
 
 usage()

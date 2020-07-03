@@ -1,0 +1,59 @@
+#!/bin/bash 
+
+search_params=$HOME/Scripts/pytools/tsearch/params.yaml
+parse=$HOME/Scripts/pytools/tyaml/tyaml
+
+program=$($parse $search_params -v default.program)
+engine=$($parse $search_params -v default.engine)
+lang="en"
+
+usage(){
+   echo -e "\033[1musage:\033[0m"
+   echo -e "$ tsearch -t \"term\" [-e] engine [-p] program"
+   echo -e "\033[1moptions:\033[0m"
+   echo -e "\033[1m-t:\033[0m term to search"
+   echo -e "\033[1m-e:\033[0m set search engine"
+   echo -e "\033[1m-p:\033[0m set program to launch"
+   echo -e  "\033[1m-l <engine|program>:\033[0m list engines/programs available"
+   echo -e "\033[1mexample:\033[0m"
+   echo -e "\033[1m$\033[0m tsearch -t \"free software\" -e duckduckgo -p firefox"
+#    echo "engines available"
+#    echo "$($parse $search_params -k engine)
+}
+
+url_encode(){
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+    
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            ' ') printf "+" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+    
+    LC_COLLATE=$old_lc_collate
+}
+
+while getopts p:e:t:hl: option
+do
+case "${option}"
+in
+p) program=${OPTARG};;
+e) engine=${OPTARG};;
+t) term=$(url_encode "${OPTARG}");; 
+h) usage;;
+l) echo -e "$($parse $search_params -k "${OPTARG}")";;
+esac
+done
+
+get_query(){
+    query=$($parse $search_params -v engine."$1".query)
+    echo "${query/TERM/$term}"
+}
+
+command=$($parse $search_params -v program."$program".command)
+$command $(get_query $engine)
