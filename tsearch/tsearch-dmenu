@@ -1,19 +1,16 @@
 #!/bin/bash
 
-TSEARCH=$HOME/Scripts/pytools/tsearch/tsearch
-parse=$HOME/Scripts/pytools/tyaml/tyaml
-
-CONFIG=$HOME/Scripts/pytools/tsearch/params.yaml
+CONFIG=/etc/tinytools/params.yaml
 
 ENGINE_OPTION=">> CHANGE ENGINE"
 PROGRAM_OPTION=">> CHANGE PROGRAM"
 CLIP_OPTION=$(echo $(xclip -selection c -o))
 
-ENGINE_CHOICES=$($parse $CONFIG -k engine)
-PROGRAM_CHOICES=$($parse $CONFIG -k program)
+ENGINE_CHOICES=$(tyaml $CONFIG -k engine)
+PROGRAM_CHOICES=$(tyaml $CONFIG -k program)
 
-PROMPT=$($parse $CONFIG -v default.engine)
-COMMAND=$TSEARCH
+PROMPT=$(tyaml $CONFIG -v default.engine)
+COMMAND=tsearch
 IS_SPECIAL_INPUT=1
 
 if [ -n "$1" ]; then
@@ -38,6 +35,7 @@ main(){
             "$PROGRAM_OPTION") 
                 SELECTED_PROGRAM=$(echo -e "$PROGRAM_CHOICES" | dmenu -p "Program:" -i)
                 if [ -n "$SELECTED_PROGRAM" ]; then
+                    PROGRAM="$SELECTED_PROGRAM"
                     COMMAND="$COMMAND -p $PROGRAM"
                 fi
                 IS_SPECIAL_INPUT=1

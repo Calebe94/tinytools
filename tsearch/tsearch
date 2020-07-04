@@ -1,10 +1,9 @@
 #!/bin/bash 
 
-search_params=$HOME/Scripts/pytools/tsearch/params.yaml
-parse=$HOME/Scripts/pytools/tyaml/tyaml
+search_params=/etc/tinytools/params.yaml
 
-program=$($parse $search_params -v default.program)
-engine=$($parse $search_params -v default.engine)
+program=$(tyaml $search_params -v default.program)
+engine=$(tyaml $search_params -v default.engine)
 lang="en"
 
 usage(){
@@ -18,7 +17,7 @@ usage(){
    echo -e "\033[1mexample:\033[0m"
    echo -e "\033[1m$\033[0m tsearch -t \"free software\" -e duckduckgo -p firefox"
 #    echo "engines available"
-#    echo "$($parse $search_params -k engine)
+#    echo "$(tyaml $search_params -k engine)
 }
 
 url_encode(){
@@ -46,14 +45,14 @@ p) program=${OPTARG};;
 e) engine=${OPTARG};;
 t) term=$(url_encode "${OPTARG}");; 
 h) usage;;
-l) echo -e "$($parse $search_params -k "${OPTARG}")";;
+l) echo -e "$(tyaml $search_params -k "${OPTARG}")";;
 esac
 done
 
 get_query(){
-    query=$($parse $search_params -v engine."$1".query)
+    query=$(tyaml $search_params -v engine."$1".query)
     echo "${query/TERM/$term}"
 }
 
-command=$($parse $search_params -v program."$program".command)
+command=$(tyaml $search_params -v program."$program".command)
 $command $(get_query $engine)
