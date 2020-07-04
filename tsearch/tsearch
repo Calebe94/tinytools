@@ -16,8 +16,7 @@ usage(){
    echo -e  "\033[1m-l <engine|program>:\033[0m list engines/programs available"
    echo -e "\033[1mexample:\033[0m"
    echo -e "\033[1m$\033[0m tsearch -t \"free software\" -e duckduckgo -p firefox"
-#    echo "engines available"
-#    echo "$(tyaml $search_params -k engine)
+   echo -e "- all search parameters are located in /etc/tinytools/params.yaml"
 }
 
 url_encode(){
