@@ -13,6 +13,29 @@ Tiny scripts to improve your productivity.
 * [ttodo](ttdodo/README.md) - A simple dmenu wrapper to create and access your todo list.
 * [twindow](twindow/README.md) - A simple python script using dmenu and i3ipc module to list all opened windows in **i3wm** and be able to focus on the one selected.
 
+## Installation
+
+Edit Makefile to match where to install tinytools and where to place default config files (**tinytools** is installed into the /usr/bin namespace by default).
+
+Afterwards enter the following command to install **tinytools** (if necessary as root):
+
+```bash
+make install
+```
+
+Or if you want to install an specific tool, you can run:
+
+```bash
+# if you want to install tsearch for example
+make tsearch
+```
+
+To uninstall **tinytools** you can run:
+
+```bash
+make uninstall
+```
+
 ## Team
 
 | <img src="https://github.com/Calebe94.png?size=200" alt="Edimar Calebe Castanho"> | <img src="https://github.com/gbgabo.png?size=200" alt="Gabriel Gaboardi"> | 
