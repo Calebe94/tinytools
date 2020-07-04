@@ -3,8 +3,9 @@
 
 .POSIX:
 
-BIN_FOLDER=bin
-CONFIG_FOLDER=tinytools
+BIN_FOLDER=/usr/bin/
+CONFIG_FOLDER=/etc/tinytools
+
 
 ${BIN_FOLDER}:
 	@echo "Creating ${BIN_FOLDER} folder ..."
@@ -15,29 +16,52 @@ ${CONFIG_FOLDER}:
 	mkdir ${CONFIG_FOLDER}
 
 tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER}
-	@echo "Installing tsearh..."
+	@echo "Installing tsearch..."
+	install -m +x tsearch/tsearch ${BIN_FOLDER}
+	install -m +x tsearch/tsearch-dmenu ${BIN_FOLDER}
+	install tsearch/params.yaml ${CONFIG_FOLDER}
+	@echo "done!"
 
 tpomodoro: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tpomodoro..."
+	install -m +x tpomodoro/tpomodoro ${BIN_FOLDER}
+	$(eval notification_folder := sounds/tpomodoro/)
+	[ -d $(notification_folder) ] || mkdir -p $(notification_folder)
+	install tpomodoro/Notification.mp3 $(notification_folder)
+	@echo "done!"
 
 ttodo: ${CONFIG_FOLDER} ${BIN_FOLDER}
-
 	@echo "Installing ttodo..."
+	install -m +x ttodo/ttodo ${BIN_FOLDER}
+	install -m +x ttodo/dmenu_ttodo ${BIN_FOLDER}
+	@echo "done!"
 
 tmenu: ${CONFIG_FOLDER} ${BIN_FOLDER}
-
 	@echo "Installing tmenu..."
+	install -m +x tmenu/tmenu ${BIN_FOLDER}
+	install tmenu/menu.yaml ${CONFIG_FOLDER}
+	@echo "done!"
 
 tyaml: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tyaml..."
+	install -m +x tyaml/tyaml ${BIN_FOLDER}
+	@echo "done!"
 
 tnotes: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tnotes..."
+	install -m +x tnotes/tnotes ${BIN_FOLDER}
+	install -m +x tnotes/dmenu_tnotes ${BIN_FOLDER}
+	@echo "done!"
 
 tgoeswall: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tgoeswall..."
+	install -m +x tgoeswall/tgoeswall ${BIN_FOLDER}
+	@echo "done!"
+
+install:
+	@echo ${@}
 
 all: tsearch tpomodoro ttodo tmenu tyaml tnotes tgoeswall
-	@echo "Packages installed!"
+	@echo "tinytools installed successfully!"
 
 .PHONY: all tsearh tpomodoro ttodo tmenu tyaml tnotes tgoeswall
