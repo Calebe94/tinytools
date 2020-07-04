@@ -1,119 +1,41 @@
-#!/usr/bin/python
-import os
-import dmenu
-import json
+#!/bin/bash 
 
-MENU_ITEMS = str()
-CONFIG_PATH = os.path.join(os.getenv('HOME'), '.config/tmenu.conf')
+####################################################################################################
+# VARIABLES 
+####################################################################################################
+TYAML=$(pwd)/tyaml
+MENU_CONFIG_PATH=$1
+TYAML_COMMAND="$TYAML $MENU_CONFIG_PATH"
 
-def dmenu_show(items, message):
-    return dmenu.show(
-        items,
-        prompt=message,
-        background='#1c1f25',
-        foreground='#f3f4f5',
-        background_selected='#BD93F9',
-        foreground_selected='#f3f4f5',
-        font="San Francisco Display:size=12"
-        )
+####################################################################################################
+# Functions
+####################################################################################################
 
-def get_item(dmenu_command, menu_items):
-    for item in menu_items:
-        try:
-            if dmenu_command == item["name"]:
-                return item
-        except Exception as error:
-            print(error)
+function remove_commands 
+{
+    awk -F : '{print $1}'
+}
 
-def get_command(item):
-    command = str()
-    try:
-        command = item["command"]
-    except Exception as error:
-        print("Command Error", error)
-    return command
+function get_command
+{
+    awk -F : /"$1"/'{print $2}'
+}
 
-def get_submenu(item):
-    submenu = list()
-    try:
-        submenu = item["submenu"]
-    except Exception as error:
-        print("Submenu Error", error)
-    return submenu
+function get_only_tags
+{
+    awk -F . '{print $2}' | uniq
+}
 
-def get_name(item):
-    name = str()
-    try:
-        name = item["name"]
-    except Exception as error:
-        print("Name Error", error)
-    return name
+####################################################################################################
+# Execute dmenu for the first time
+####################################################################################################
 
-def get_confirm_message(item):
-    message = str()
-    try:
-        message = item["confirm"]
-    except Exception as error:
-        print("Confirm Message Error", error)
-    return message
+#           execute tyaml             remove commands   get only tags            pipe to dmenu
+selected=$($TYAML $MENU_CONFIG_PATH | remove_commands | get_only_tags | dmenu -p "Menu")
 
-def get_show_confirm(item):
-    show = bool(False)
-    try:
-        if item["confirm"]:
-            show = True
-    except Exception as error:
-        print("Show Confirm", error)
-    return show
-
-def get_names(menu_items):
-    names_list = list()
-    for item in menu_items:
-        try:
-            names_list.append(item["name"])
-        except Exception as error:
-            print("Names", error)
-    return names_list
-
-def apply_command(command_name, items_list):
-    item = get_item(command_name, items_list)
-    if get_show_confirm(item) == True:
-        if dmenu_show(['no', 'yes'], get_confirm_message(item)) == 'yes':
-            command = get_command(item)
-            os.system(command)
-    elif get_submenu(item):
-        selected = dmenu_show(get_names(get_submenu(item)), get_name(item))
-        apply_command(selected, get_submenu(item))
-    else:
-        command = get_command(item)
-        os.system(command)
-
-def load_config(path):
-    menu_items = dict()
-    try:
-        with open(path, 'r') as config_file:
-            menu_items = json.load(config_file)
-    except json.decoder.JSONDecodeError as exception: 
-        print(exception)
-        menu_items = [
-            {"name": "ConfigFileSintaxError"},
-            {"name": str(exception)}
-        ]
-    except FileNotFoundError as exception:
-        print(exception)
-        menu_items = [
-            {"name": "ConfigFileNotFound"},
-            {"name": str(exception)}
-        ]
-    
-    return menu_items
-
-
-def main():
-    MENU_ITEMS = load_config(CONFIG_PATH)
-    selected=dmenu_show(get_names(MENU_ITEMS), "Menu")
-
-    apply_command(selected, MENU_ITEMS)
-
-if __name__ == "__main__":
-    main()
+if [[ ! -z $selected ]]; 
+then
+    command=$($TYAML_COMMAND | get_command $selected)
+    [ "${command[@]}" != "null" ] && eval "${command[@]}" &
+    exit 1
+fi
