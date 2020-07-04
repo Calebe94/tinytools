@@ -3,9 +3,8 @@
 ####################################################################################################
 # VARIABLES 
 ####################################################################################################
-TYAML=$(pwd)/tyaml
 MENU_CONFIG_PATH=$1
-TYAML_COMMAND="$TYAML $MENU_CONFIG_PATH"
+TYAML_COMMAND="tyaml $MENU_CONFIG_PATH"
 
 ####################################################################################################
 # Functions
@@ -31,7 +30,7 @@ function get_only_tags
 ####################################################################################################
 
 #           execute tyaml             remove commands   get only tags            pipe to dmenu
-selected=$($TYAML $MENU_CONFIG_PATH | remove_commands | get_only_tags | dmenu -p "Menu")
+selected=$(tyaml $MENU_CONFIG_PATH | remove_commands | get_only_tags | dmenu -p "Menu")
 
 if [[ ! -z $selected ]]; 
 then
