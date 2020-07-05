@@ -34,18 +34,9 @@ display_items()
   tag_selected=$($TYAML_COMMAND -k $current_path | dmenu -p $menu_prompt)
   [ -z $tag_selected ] || check_sub_item $tag_selected
 }
+
 ####################################################################################################
 # Execute dmenu for the first time
 ####################################################################################################
 
 display_items
-#           execute tyaml             remove commands   get only tags            pipe to dmenu
-#selected=$($TYAML_COMMAND -k $menu_prompt | dmenu -p $menu_prompt)
-
-#if [[ ! -z $selected ]]; 
-#then
-#    command=$($TYAML_COMMAND -v "$menu_prompt.$selected")
-#    echo $selected
-
-#    exit 1
-#fi
