@@ -72,21 +72,32 @@ usage()
    echo -e "\033[1m-v: get yaml values"
    echo -e "\033[1mexample:\033[0m"
    echo -e "\033[1m$\033[0m tyaml file.yaml -k option1.values"
+   exit 0
 }
 
-if [ -n "$2" ]; then
-   case "$2" in
-      "-v")
-         get_value $1 $3
-         ;;
-      "-k")
-         list_keys $1 $3
-         ;;
-      "-h" | *)
-         usage
-         exit 0
-         ;;
-   esac
+
+if [ -f "$1" ]; then
+   if [ -n "$2" ]; then
+      case "$2" in
+         "-v")
+            get_value $1 $3
+            ;;
+         "-k")
+            list_keys $1 $3
+            ;;
+         *)
+            usage
+            ;;
+      esac
+   else
+      list_all_paths $1
+   fi
 else
-   list_all_paths $1
+   case "$1" in
+      "-h")
+         usage
+         ;;
+      *)
+         echo "file not declared";;
+   esac
 fi
