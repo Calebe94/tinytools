@@ -5,23 +5,44 @@
 ####################################################################################################
 MENU_CONFIG_PATH=$1
 TYAML_COMMAND="tyaml $MENU_CONFIG_PATH"
+menu_prompt=$($TYAML_COMMAND -k)
+current_path=$menu_prompt
 
 ####################################################################################################
 # Functions
 ####################################################################################################
 
+check_sub_item()
+{
+  sub_item=$($TYAML_COMMAND -k current_path)
+  echo "sub item $sub_item"
+  if [ ! -z sub_item ];
+  then
+    echo "execute command"
+  else
+    echo "display_items again with path $current_path"
+  fi
+}
+
+display_items()
+{
+  tag_selected=$($TYAML_COMMAND -k $current_path | dmenu -p $menu_prompt)
+  current_path+=.$tag_selected
+  echo $current_path
+  check_sub_item
+}
 ####################################################################################################
 # Execute dmenu for the first time
 ####################################################################################################
 
-menu_prompt=$($TYAML_COMMAND -k)
-
+display_items
 #           execute tyaml             remove commands   get only tags            pipe to dmenu
-selected=$($TYAML_COMMAND -k $menu_prompt | dmenu -p $menu_prompt)
+#selected=$($TYAML_COMMAND -k $menu_prompt | dmenu -p $menu_prompt)
 
-if [[ ! -z $selected ]]; 
-then
-    command=$($TYAML_COMMAND -v "$menu_prompt.$selected")
-    [ "${command[@]}" != "null" ] && eval "${command[@]}" &
-    exit 1
-fi
+#if [[ ! -z $selected ]]; 
+#then
+#    command=$($TYAML_COMMAND -v "$menu_prompt.$selected")
+#    echo $selected
+    #[ "${command[@]}" != "null" ] && eval "${command[@]}" &
+#    exit 1
+#fi
