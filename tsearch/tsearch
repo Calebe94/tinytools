@@ -8,7 +8,7 @@ lang="en"
 
 usage(){
    echo -e "\033[1musage:\033[0m"
-   echo -e "$ tsearch -t \"term\" [-e] engine [-p] program"
+   echo -e "tsearch -t \"term\" [-e] engine [-p] program"
    echo -e "\033[1moptions:\033[0m"
    echo -e "\033[1m-t:\033[0m term to search"
    echo -e "\033[1m-e:\033[0m set search engine"
