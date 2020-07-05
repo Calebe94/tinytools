@@ -29,17 +29,22 @@ get_keys()
 {
    local file=$1
    local path=$2
-   tyaml_parser $file | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}' | awk -F : '{print $1}'
+   if [ -z "$path" ]; then
+      tyaml_parser $file | awk -F. '{print $1}' | awk '!seen[$1]++'
+   else
+      tyaml_parser $file | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}' | awk -F : '{print $1}'
+   fi
 }
 
 usage()
 {
-   echo "usage: tyaml FILE [-k] [-v] argument"
-   echo "options:"
-   echo "-k: get yaml keys"
-   echo "-v: get yaml values"
-   echo "example:"
-   echo "$ tyaml file.yaml -k option1.values"
+   echo -e "\033[1musage:\033[0m"
+   echo -e "tyaml FILE [-k] [-v] argument"
+   echo -e "\033[1moptions:\033[0m"
+   echo -e "\033[1m-k:\033[0m get yaml keys"
+   echo -e "\033[1m-v: get yaml values"
+   echo -e "\033[1mexample:\033[0m"
+   echo -e "\033[1m$\033[0m tyaml file.yaml -k option1.values"
 }
 
 if [ -n "$2" ]; then
