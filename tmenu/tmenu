@@ -14,22 +14,25 @@ current_path=$menu_prompt
 
 check_sub_item()
 {
-  sub_item=$($TYAML_COMMAND -k current_path)
-  echo "sub item $sub_item"
-  if [ ! -z sub_item ];
+  selected_tag=$1
+  current_path+=.$selected_tag
+
+  sub_item=$($TYAML_COMMAND -k $current_path)
+  
+  if [[ -z $sub_item ]];
   then
-    echo "execute command"
+    command=$($TYAML_COMMAND -v $current_path)
+    [ "${command[@]}" != "null" ] && eval "${command[@]}" &
   else
-    echo "display_items again with path $current_path"
+    menu_prompt=$selected_tag
+    display_items
   fi
 }
 
 display_items()
 {
   tag_selected=$($TYAML_COMMAND -k $current_path | dmenu -p $menu_prompt)
-  current_path+=.$tag_selected
-  echo $current_path
-  check_sub_item
+  [ -z $tag_selected ] || check_sub_item $tag_selected
 }
 ####################################################################################################
 # Execute dmenu for the first time
@@ -43,6 +46,6 @@ display_items
 #then
 #    command=$($TYAML_COMMAND -v "$menu_prompt.$selected")
 #    echo $selected
-    #[ "${command[@]}" != "null" ] && eval "${command[@]}" &
+
 #    exit 1
 #fi
