@@ -18,6 +18,11 @@ function tyaml_parser
    }'
 }
 
+remove_value()
+{
+   awk -F : '{print $1}'
+}
+
 get_value()
 {
    local file=$1
@@ -30,9 +35,9 @@ get_keys()
    local file=$1
    local path=$2
    if [ -z "$path" ]; then
-      tyaml_parser $file | awk -F. '{print $1}' | awk '!seen[$1]++'
+      tyaml_parser $file | remove_value | awk -F . '{print $1}' | awk '!seen[$1]++'
    else
-      tyaml_parser $file | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}' | awk -F : '{print $1}'
+      tyaml_parser $file | remove_value | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}'
    fi
 }
 
