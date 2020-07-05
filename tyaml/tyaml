@@ -34,11 +34,13 @@ get_keys()
 {
    local file=$1
    local path=$2
+   local keys
    if [ -z "$path" ]; then
-      tyaml_parser $file | remove_value | awk -F . '{print $1}' | awk '!seen[$1]++'
+      keys=$(tyaml_parser $file | remove_value | awk -F . '{print $1}')
    else
-      tyaml_parser $file | remove_value | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}'
+      keys=$(tyaml_parser $file | remove_value | awk '/^'$path'/{print $0}' | awk -F "$path". '{print $2}' | awk -F . '{print $1}')
    fi
+   echo -e "$keys" | awk '!seen[$1]++'
 }
 
 usage()
