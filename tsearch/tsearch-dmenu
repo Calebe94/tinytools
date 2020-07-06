@@ -6,10 +6,10 @@ ENGINE_OPTION=">> CHANGE ENGINE"
 PROGRAM_OPTION=">> CHANGE PROGRAM"
 CLIP_OPTION=$(echo $(xclip -selection c -o))
 
-ENGINE_CHOICES=$(tyaml $CONFIG -k engine)
-PROGRAM_CHOICES=$(tyaml $CONFIG -k program)
+ENGINE_CHOICES=$(tsearch -l engine)
+PROGRAM_CHOICES=$(tsearch -l program)
 
-PROMPT=$(tyaml $CONFIG -v default.engine)
+PROMPT=$(tsearch -l default.engine)
 COMMAND=tsearch
 IS_SPECIAL_INPUT=1
 
