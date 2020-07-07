@@ -2,7 +2,7 @@
 # The name of the engine/program needs to be exactly as declared on the listing next below
 default:
   engine: duckduckgo
-  program: firefox
+  program: system-default
 
 # To add another engine, follow the structure of engine_name and query
 # Declare where the search term needs to be in the URL by putting the word TERM
@@ -35,3 +35,5 @@ program:
     command: google-chrome-stable
   curl:
     command: curl
+  system-default:
+    command: xdg-open

@@ -1,9 +1,9 @@
 #!/bin/bash 
 
-search_params=/etc/tinytools/params.yaml
+search_params="tyaml /etc/tinytools/params.yaml"
 
-program=$(tyaml $search_params -v default.program)
-engine=$(tyaml $search_params -v default.engine)
+program=$($search_params -v default.program)
+engine=$($search_params -v default.engine)
 lang="en"
 
 usage(){
@@ -17,6 +17,7 @@ usage(){
    echo -e "\033[1mexample:\033[0m"
    echo -e "\033[1m$\033[0m tsearch -t \"free software\" -e duckduckgo -p firefox"
    echo -e "- all search parameters are located in /etc/tinytools/params.yaml"
+   exit 0
 }
 
 url_encode(){
@@ -36,22 +37,37 @@ url_encode(){
     LC_COLLATE=$old_lc_collate
 }
 
-while getopts p:e:t:hl: option
-do
-case "${option}"
-in
-p) program=${OPTARG};;
-e) engine=${OPTARG};;
-t) term=$(url_encode "${OPTARG}");; 
-h) usage;;
-l) echo -e "$(tyaml $search_params -k "${OPTARG}")";;
-esac
-done
-
-get_query(){
-    query=$(tyaml $search_params -v engine."$1".query)
-    echo "${query/TERM/$term}"
+list()
+{
+    case "$1" in
+        engine|program)
+            echo -e "$($search_params -k "$1")"
+            ;;
+        default*)
+            echo -e "$($search_params -v "$1")"
+    esac
+    exit 0
 }
 
-command=$(tyaml $search_params -v program."$program".command)
-$command $(get_query $engine)
+while getopts p:e:t:hl: option 
+do
+    case "${option}" in
+        p) program=${OPTARG};;
+        e) engine=${OPTARG};;
+        t) term=$(url_encode "${OPTARG}");; 
+        h) usage;;
+        l) list "${OPTARG}";;
+    esac
+done
+
+if [ -n "$term" ]; then
+    get_query(){
+        query=$($search_params -v engine."$1".query)
+        echo "${query/TERM/$term}"
+    }
+
+    command=$($search_params -v program."$program".command)
+    $command $(get_query $engine)
+else
+    echo "no term declared"
+fi
