@@ -10,6 +10,7 @@ lowest=0        # lowest
 greatest=100    # greatest
 step=5          # step
 index_max=0
+value=0
 
 calculate_index_max()
 {
@@ -37,6 +38,7 @@ fill_remaining()
 
 main()
 {
+  index_max=$(calculate_index_max)
   index=$(get_index_from_porcentage $1)
   fill_progress $index
   fill_remaining $index
@@ -52,7 +54,6 @@ usage()
   echo "-g: greatest value to be received (default: 100)"
   echo "-s: step value of the progress bar (default: 5)"
   echo "-b: string format of the bar - should contain %s and no spaces between characters"
-  echo "note that the value argument should be the last one"
   exit 0
 }
 
@@ -71,8 +72,6 @@ while getopts "s:l:g:v:h:b:" args; do
       ;;
     v)
       value=${OPTARG}
-      index_max=$(calculate_index_max)
-      main $value
       ;;
     b|bar)
       slider="${OPTARG}"
@@ -86,3 +85,4 @@ while getopts "s:l:g:v:h:b:" args; do
   esac
 done
 
+main $value
