@@ -1,10 +1,13 @@
 #!/bin/bash
-# Progress will be counted 5 by 5.
-# 20 - 100%
 
+# Default progress will be counted 5 by 5.
+# where 20 '#' will be equal to 100%.
+
+MIN=0
 MAX=20
+
 slider_bar=""
-slider="[$slider_bar]"
+slider="[%s]"
 
 get_index_from_porcentage()
 {
@@ -12,11 +15,32 @@ get_index_from_porcentage()
   echo $index
 }
 
+fill_progress()
+{
+  local index=$1
+  for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar"#"; done
+}
+
+fill_remaining()
+{
+  local index=$1
+  for ((i=$index; i< $MAX; i+=1)); do slider_bar=$slider_bar"-"; done
+}
+
 index=$(get_index_from_porcentage $1)
 
-for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar"#"; done
+main()
+{
+  index=$(get_index_from_porcentage $1)
 
-for ((i=$index; i< $MAX; i+=1)); do slider_bar=$slider_bar"-"; done
+  fill_progress $index
+  fill_remaining $index
+  printf $slider $slider_bar; printf '\n'
+}
 
-echo "[$slider_bar]"
+usage()
+{
+  echo "usage: tslidepar [value]"
+}
 
+[ ! -z $1 ] && main $1 || usage
