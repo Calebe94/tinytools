@@ -3,16 +3,24 @@
 # Default progress will be counted 5 by 5.
 # where 20 '#' will be equal to 100%.
 
-MIN=0
-MAX=20
-
 slider_bar=""
 slider="[%s]"
 
+lowest=0        # lowest
+greatest=100    # greatest
+step=5          # step
+index_max=0
+
+calculate_index_max()
+{
+  let index_max=($greatest-$lowest)/$step
+  echo $index_max
+}
+
 get_index_from_porcentage()
 {
-  let index=$1*20/100
-  echo $index
+  let index=$1*$index_max/$greatest
+  [ $index -gt $index_max ] || echo $index && echo $index_max
 }
 
 fill_progress()
@@ -24,15 +32,12 @@ fill_progress()
 fill_remaining()
 {
   local index=$1
-  for ((i=$index; i< $MAX; i+=1)); do slider_bar=$slider_bar"-"; done
+  for ((i=$index; i< $index_max; i+=1)); do slider_bar=$slider_bar"-"; done
 }
-
-index=$(get_index_from_porcentage $1)
 
 main()
 {
   index=$(get_index_from_porcentage $1)
-
   fill_progress $index
   fill_remaining $index
   printf $slider $slider_bar; printf '\n'
@@ -40,7 +45,40 @@ main()
 
 usage()
 {
-  echo "usage: tslidepar [value]"
+  echo "usage: tprogbar [-s <step>] [-l <lowest>] [-g <greatest>] [-v <value>] "
+  echo "options:"
+  echo "-v: value to be displayed on bar"
+  echo "-l: lowest value to be received (default: 0)"
+  echo "-g: greatest value to be received (default: 100)"
+  echo "-s: step value of the progress bar (default: 5)"
+  echo "note that the value argument should be the last one"
+  exit 0
 }
 
-[ ! -z $1 ] && main $1 || usage
+[[ -z "$@" ]] && usage
+
+while getopts "s:l:g:v:h:" args; do
+  case "${args}" in
+    s)
+      step=${OPTARG}
+      ;;
+    l)
+      lowest=${OPTARG}
+      ;;
+    g)
+      greatest=${OPTARG}
+      ;;
+    v)
+      value=${OPTARG}
+      index_max=$(calculate_index_max)
+      main $value
+      ;;
+    * )
+      usage
+      ;;
+    h | help)
+      usage
+      ;;
+  esac
+done
+
