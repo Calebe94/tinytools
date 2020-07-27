@@ -1,0 +1,22 @@
+#!/bin/bash
+# Progress will be counted 5 by 5.
+# 20 - 100%
+
+MAX=20
+slider_bar=""
+slider="[$slider_bar]"
+
+get_index_from_porcentage()
+{
+  let index=$1*20/100
+  echo $index
+}
+
+index=$(get_index_from_porcentage $1)
+
+for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar"#"; done
+
+for ((i=$index; i< $MAX; i+=1)); do slider_bar=$slider_bar"-"; done
+
+echo "[$slider_bar]"
+
