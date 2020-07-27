@@ -58,6 +58,11 @@ tgoeswall: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	install -m 555 tgoeswall/tgoeswall ${BIN_FOLDER}
 	@echo "done!"
 
+tprogbar: ${BIN_FOLDER}
+	@echo "Installing tprogbar..."
+	install -m 555 tprogbar/tprogbar ${BIN_FOLDER}
+	@echo "done!"
+
 uninstall:
 	@echo "Removing tinytools..."
 	rm -f ${BIN_FOLDER}/tsearch
@@ -72,9 +77,10 @@ uninstall:
 	rm -f ${BIN_FOLDER}/dmenu_tnotes
 	rm -f ${BIN_FOLDER}/tgoeswall
 	rm -fr ${CONFIG_FOLDER}
+	rm -f ${BIN_FOLDER}/tprogbar
 	@echo "done!"
 
-install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro
+install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearh tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall
+.PHONY: install tsearh tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar
