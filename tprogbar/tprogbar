@@ -5,6 +5,8 @@
 
 slider_bar=""
 slider="[%s]"
+progress_char="#"
+mask_char="-"
 
 lowest=0        # lowest
 greatest=100    # greatest
@@ -27,13 +29,13 @@ get_index_from_porcentage()
 fill_progress()
 {
   local index=$1
-  for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar"#"; done
+  for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar$progress_char; done
 }
 
 fill_remaining()
 {
   local index=$1
-  for ((i=$index; i< $index_max; i+=1)); do slider_bar=$slider_bar"-"; done
+  for ((i=$index; i< $index_max; i+=1)); do slider_bar=$slider_bar$mask_char; done
 }
 
 main()
@@ -54,13 +56,21 @@ usage()
   echo "-g: greatest value to be received (default: 100)"
   echo "-s: step value of the progress bar (default: 5)"
   echo "-b: string format of the bar - should contain %s and no spaces between characters"
+  echo "-p: progress character (avoid \"*\")"
+  echo "-m: mask character (avoid \"*\")"
   exit 0
 }
 
 [[ -z "$@" ]] && usage
 
-while getopts "s:l:g:v:h:b:" args; do
+while getopts "s:l:g:v:h:b:p:m:" args; do
   case "${args}" in
+    m)
+      mask_char=${OPTARG}
+      ;;
+    p)
+      progress_char=${OPTARG}
+      ;;
     s)
       step=${OPTARG}
       ;;
