@@ -45,19 +45,20 @@ main()
 
 usage()
 {
-  echo "usage: tprogbar [-s <step>] [-l <lowest>] [-g <greatest>] [-v <value>] "
+  echo "usage: tprogbar [-s <step>] [-l <lowest>] [-g <greatest>] [-v <value>] [-b <string>]"
   echo "options:"
   echo "-v: value to be displayed on bar"
   echo "-l: lowest value to be received (default: 0)"
   echo "-g: greatest value to be received (default: 100)"
   echo "-s: step value of the progress bar (default: 5)"
+  echo "-b: string format of the bar - should contain %s and no spaces between characters"
   echo "note that the value argument should be the last one"
   exit 0
 }
 
 [[ -z "$@" ]] && usage
 
-while getopts "s:l:g:v:h:" args; do
+while getopts "s:l:g:v:h:b:" args; do
   case "${args}" in
     s)
       step=${OPTARG}
@@ -72,6 +73,9 @@ while getopts "s:l:g:v:h:" args; do
       value=${OPTARG}
       index_max=$(calculate_index_max)
       main $value
+      ;;
+    b|bar)
+      slider="${OPTARG}"
       ;;
     * )
       usage
