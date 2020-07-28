@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# Default progress will be counted 5 by 5.
+# where 20 '#' will be equal to 100%.
+
+slider_bar=""
+slider="[%s]"
+progress_char="#"
+mask_char="-"
+
+lowest=0        # lowest
+greatest=100    # greatest
+step=5          # step
+index_max=0
+value=0
+
+calculate_index_max()
+{
+  let index_max=($greatest-$lowest)/$step
+  echo $index_max
+}
+
+get_index_from_porcentage()
+{
+  let index=$1*$index_max/$greatest
+  [ $index -gt $index_max ] || echo $index && echo $index_max
+}
+
+fill_progress()
+{
+  local index=$1
+  for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar$progress_char; done
+}
+
+fill_remaining()
+{
+  local index=$1
+  for ((i=$index; i< $index_max; i+=1)); do slider_bar=$slider_bar$mask_char; done
+}
+
+main()
+{
+  index_max=$(calculate_index_max)
+  index=$(get_index_from_porcentage $1)
+  fill_progress $index
+  fill_remaining $index
+  printf $slider $slider_bar; printf '\n'
+}
+
+usage()
+{
+  echo "usage: tprogbar [-s <step>] [-l <lowest>] [-g <greatest>] [-v <value>] [-b <string>]"
+  echo "options:"
+  echo "-v: value to be displayed on bar"
+  echo "-l: lowest value to be received (default: 0)"
+  echo "-g: greatest value to be received (default: 100)"
+  echo "-s: step value of the progress bar (default: 5)"
+  echo "-b: string format of the bar - should contain %s and no spaces between characters"
+  echo "-p: progress character (avoid \"*\")"
+  echo "-m: mask character (avoid \"*\")"
+  exit 0
+}
+
+[[ -z "$@" ]] && usage
+
+while getopts "s:l:g:v:h:b:p:m:" args; do
+  case "${args}" in
+    m)
+      mask_char=${OPTARG}
+      ;;
+    p)
+      progress_char=${OPTARG}
+      ;;
+    s)
+      step=${OPTARG}
+      ;;
+    l)
+      lowest=${OPTARG}
+      ;;
+    g)
+      greatest=${OPTARG}
+      ;;
+    v)
+      value=${OPTARG}
+      ;;
+    b|bar)
+      slider="${OPTARG}"
+      ;;
+    * )
+      usage
+      ;;
+    h | help)
+      usage
+      ;;
+  esac
+done
+
+main $value
