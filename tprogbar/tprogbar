@@ -7,6 +7,7 @@ slider_bar=""
 slider="[%s]"
 progress_char="#"
 mask_char="-"
+vertical=""
 
 lowest=0        # lowest
 greatest=100    # greatest
@@ -38,13 +39,32 @@ fill_remaining()
   for ((i=$index; i< $index_max; i+=1)); do slider_bar=$slider_bar$mask_char; done
 }
 
+vfill_progress()
+{
+  local index=$1
+  for ((i=$index; i<= $index_max; i+=1)); do slider_bar=$slider_bar$progress_char'\n'; done
+}
+
+vfill_remaining()
+{
+  local index=$1
+  for ((i=1; i<= $index; i+=1)); do slider_bar=$slider_bar$mask_char'\n'; done
+}
+
 main()
 {
   index_max=$(calculate_index_max)
   index=$(get_index_from_porcentage $1)
-  fill_progress $index
-  fill_remaining $index
-  printf $slider $slider_bar; printf '\n'
+  if [ -n "$2" ]; then
+    vfill_progress $index
+    vfill_remaining $index
+    printf $slider_bar; printf '\n'
+    exit
+  else
+    fill_progress $index
+    fill_remaining $index
+    printf $slider $slider_bar; printf '\n'
+  fi
 }
 
 usage()
@@ -63,7 +83,7 @@ usage()
 
 [[ -z "$@" ]] && usage
 
-while getopts "s:l:g:v:h:b:p:m:" args; do
+while getopts "s:l:g:v:h:b:p:m:r" args; do
   case "${args}" in
     m)
       mask_char=${OPTARG}
@@ -86,6 +106,9 @@ while getopts "s:l:g:v:h:b:p:m:" args; do
     b|bar)
       slider="${OPTARG}"
       ;;
+    r)
+      vertical="true"
+      ;;
     * )
       usage
       ;;
@@ -95,4 +118,4 @@ while getopts "s:l:g:v:h:b:p:m:" args; do
   esac
 done
 
-main $value
+main $value $vertical
