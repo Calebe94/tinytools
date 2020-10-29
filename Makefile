@@ -18,7 +18,7 @@ ${CONFIG_FOLDER}:
 tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
 	@echo "Installing tsearch..."
 	install -m 555 tsearch/tsearch ${BIN_FOLDER}
-	install -m 555 tsearch/tsearch-dmenu ${BIN_FOLDER}
+	install -m 555 tsearch/dmenu_tsearch ${BIN_FOLDER}
 	install tsearch/params.yaml ${CONFIG_FOLDER}
 	@echo "done!"
 
