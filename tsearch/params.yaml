@@ -4,8 +4,8 @@ default:
   engine: duckduckgo
   program: system-default
 
-# To add another engine, follow the structure of engine_name and query
-# Declare where the search term needs to be in the URL by putting the word TERM
+# To add another engine, follow the structure of engine_name and query keys
+# Declare where the search term (-t) needs to be in the URL by putting the word TERM
 engine:
   google:
     query: https://www.google.com/search?q=TERM
@@ -25,6 +25,8 @@ engine:
     query: https://www.reddit.com/search/?q=TERM
   twitter:
     query: https://twitter.com/search?q=TERM
+  hackaday:
+    query: https://hackaday.com/?s=TERM
 
 program:
   firefox:
