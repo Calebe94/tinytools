@@ -83,4 +83,4 @@ uninstall:
 install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearh tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar
+.PHONY: install tsearch tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar
