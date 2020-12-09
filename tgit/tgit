@@ -1,0 +1,16 @@
+#!/bin/bash
+
+repos=$(find $HOME -name ".git")
+
+repo=$(echo -e "$repos" | dmenu -i -p Repos:)
+
+if [ -n "$repo" ]; then
+    prompt=$(echo "$repo" | awk -F'/' 'NF>1{print $(NF-1)":"}')
+    options="status\ndiff\ncheckout"
+
+    option=$(echo -e "$options" | dmenu -i -p "$prompt")
+
+    command="git --git-dir=$repo -C $repo $option"
+    echo $command
+    # eval "${command[@]}" &
+fi
