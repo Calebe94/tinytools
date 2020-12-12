@@ -1,16 +1,27 @@
 #!/bin/bash
 
 repos=$(find $HOME -name ".git")
+repos=$(echo "$repos" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
 
 repo=$(echo -e "$repos" | dmenu -i -p Repos:)
 
 if [ -n "$repo" ]; then
-    prompt=$(echo "$repo" | awk -F'/' 'NF>1{print $(NF-1)":"}')
+    prompt=$(echo "$repo" | awk -F'/' 'NF>1{print $(NF)":"}')
     options="status\ndiff\ncheckout"
-
     option=$(echo -e "$options" | dmenu -i -p "$prompt")
 
-    command="git --git-dir=$repo -C $repo $option"
-    echo $command
-    # eval "${command[@]}" &
+    case "$option" in
+        "checkout")
+            branchs="$(cd $repo && git branch -r)"
+            branch=$(echo -e "$branchs" | dmenu -i -p Checkout:)
+            cd $repo && git $option
+        ;;
+        *)
+            cd $repo && git $option
+        ;;
+    esac
+
+
+
+    # xfce4-terminal -H -e "echo bruh"
 fi
