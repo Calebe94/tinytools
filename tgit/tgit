@@ -14,7 +14,7 @@ if [ -n "$repo" ]; then
         "checkout")
             branchs="$(cd $repo && git branch -r)"
             branch=$(echo -e "$branchs" | dmenu -i -p Checkout:)
-            cd $repo && git $option
+            cd $repo && git $option $branch
         ;;
         *)
             cd $repo && git $option
