@@ -1,0 +1,36 @@
+#!/bin/bash
+
+tabfs_mnt_path=$HOME/Projects/TabFS/fs/mnt
+
+[ -z $1 ] || tabfs_mnt_path=$1
+
+select_tab_id()
+{
+    titles_list=""
+    cd $tabfs_mnt_path/tabs/by-id/
+    for tab in * ; do
+        titles_list+="$(cat $tab/title.txt) - $tab"
+        titles_list+='\n'
+    done
+
+    selected=$(echo -e $titles_list | dmenu)
+
+    echo $selected | awk -F " - " '{print $NF}'
+}
+
+find_sym_link_by_id()
+{
+    selected_id=$1
+    echo $(find $tabfs_mnt_path/tabs/by-title -name "*_$selected_id")
+}
+
+close_tab()
+{
+    selected_id=$1
+    tab_path=$(find_sym_link_by_id $selected_id)
+    rm $tab_path
+}
+
+selected_id=$(select_tab_id)
+
+[ -z $selected_id ] || close_tab $selected_id
