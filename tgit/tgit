@@ -14,12 +14,10 @@ if [ -n "$repo" ]; then
         "checkout")
             branchs="$(cd $repo && git branch -r)"
             branch=$(echo -e "$branchs" | dmenu -i -p Checkout:)
-            xfce4-terminal -e 'bash -c "cd '$repo' ; git '$option $branch'; zsh"'
+            x-terminal-emulator -e 'bash -c "cd '$repo' ; git '$option $branch'; zsh"'
         ;;
         *)
-            xfce4-terminal -e 'bash -c "cd '$repo' && git '$option'; zsh"'
+            x-terminal-emulator -e 'bash -c "cd '$repo' && git '$option'; zsh"'
         ;;
     esac
-
-    # xfce4-terminal -H -e "echo bruh"
 fi
