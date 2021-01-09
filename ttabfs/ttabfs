@@ -27,7 +27,7 @@ find_sym_link_by_id()
 close_tab()
 {
     selected_id=$1
-    tab_path=$(find_sym_link_by_id $selected_id)
+    tab_path=$(find_sym_link_by_id "$selected_id")
     rm $tab_path
 }
 
@@ -35,7 +35,6 @@ dark_mode_tab()
 {
     # See: https://codeburst.io/50-shades-of-dark-mode-gray-d3e9907b1194
     selected_id=$1
-    tab_path=$(find_sym_link_by_id $selected_id)
     echo 'document.body.style.background = "black"' > $tabfs_mnt_path/tabs/by-id/$selected_id/execute-script
 }
 
