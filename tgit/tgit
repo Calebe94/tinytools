@@ -1,23 +1,23 @@
 #!/bin/bash
 
-repos=$(find $HOME -name ".git")
-repos=$(echo "$repos" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
+check_status="/home/gabo/packages/tinytools/tgit/check_status"
+repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
 
-repo=$(echo -e "$repos" | dmenu -i -p Repos:)
+list() {
+    for i in $repos
+    do
+        cd $i
+        if [[ "$(git rev-parse --git-dir)" == ".git" ]]; then
+            status=$($check_status $i)
+            name="${i/"$HOME/"/''}"
+            list="$list\n[$status] $name"
+        fi
+    done
+    tmpfile=$(mktemp)
+    echo -e "$list" >> $tmpfile
+    list=$(column $tmpfile -t)
+    rm "$tmpfile"
+    echo -e "$list"
+}
 
-if [ -n "$repo" ]; then
-    prompt=$(echo "$repo" | awk -F'/' 'NF>1{print $(NF)":"}')
-    options="status\ndiff\ncheckout"
-    option=$(echo -e "$options" | dmenu -i -p "$prompt")
-
-    case "$option" in
-        "checkout")
-            branchs="$(cd $repo && git branch -r)"
-            branch=$(echo -e "$branchs" | dmenu -i -p Checkout:)
-            x-terminal-emulator -e 'bash -c "cd '$repo' ; git '$option $branch'; zsh"'
-        ;;
-        *)
-            x-terminal-emulator -e 'bash -c "cd '$repo' && git '$option'; zsh"'
-        ;;
-    esac
-fi
+list 
