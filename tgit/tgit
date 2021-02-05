@@ -1,14 +1,28 @@
 #!/bin/bash
 
 check_status="/home/gabo/packages/tinytools/tgit/check_status"
-repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
+repos=''
+
+update() {
+    repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
+    touch /tmp/repos.dat
+    echo -e "$repos" > /tmp/repos.dat
+}
+
+get_repos(){
+    if [ -f "/tmp/repos.dat" ]; then
+        echo -e "$(cat "/tmp/repos.dat")"
+    else
+        update && echo -e "$(cat "/tmp/repos.dat")"
+    fi
+}
 
 list() {
     for i in $repos
     do
         cd $i
         if [[ "$(git rev-parse --git-dir)" == ".git" ]]; then
-            status=$($check_status $i)
+            status=$($check_status $i $1)
             name="${i/"$HOME/"/''}"
             list="$list\n[$status] $name"
         fi
@@ -20,4 +34,13 @@ list() {
     echo -e "$list"
 }
 
-list 
+repos=$(get_repos)
+
+while getopts uc option 
+do
+    case "${option}" in
+        u) update && exit;;
+        c) echo -e "$(list -c)" && exit ;;
+    esac
+done
+echo -e "$(list)"
