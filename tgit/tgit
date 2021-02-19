@@ -1,0 +1,45 @@
+#!/bin/bash
+
+repos=''
+
+update() {
+    repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1' | grep -E -v 'vim|antigen')
+    touch /tmp/repos.dat
+    echo -e "$repos" > /tmp/repos.dat
+}
+
+get_repos(){
+    if [ -f "/tmp/repos.dat" ]; then
+        echo -e "$(cat "/tmp/repos.dat")"
+    else
+        update && echo -e "$(cat "/tmp/repos.dat")"
+    fi
+}
+
+list() {
+    for i in $repos
+    do
+        cd $i
+        if [[ "$(git rev-parse --git-dir)" == ".git" ]]; then
+            status=$(tgit_status $i $1)
+            name="${i/"$HOME/"/''}"
+            list="$list\n[$status] $name"
+        fi
+    done
+    tmpfile=$(mktemp)
+    echo -e "$list" >> $tmpfile
+    list=$(column $tmpfile -t)
+    rm "$tmpfile"
+    echo -e "$list"
+}
+
+repos=$(get_repos)
+
+while getopts uc option 
+do
+    case "${option}" in
+        u) update && exit;;
+        c) echo -e "$(list -c)" && exit ;;
+    esac
+done
+echo -e "$(list)"
