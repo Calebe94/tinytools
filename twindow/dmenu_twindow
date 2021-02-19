@@ -1,0 +1,12 @@
+#!/bin/bash
+
+twindow="wmctrl -l"
+
+window=$(echo "$($twindow)" | awk '{$1="";$2="";$3=""; print $0}' | dmenu -i -p Windows:)
+echo "$window"
+
+[[ -n $window ]] || exit
+
+prompt="$window"
+
+wmctrl -a $window
