@@ -22,6 +22,13 @@ tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
 	install tsearch/params.yaml ${CONFIG_FOLDER}
 	@echo "done!"
 
+tgit: ${CONFIG_FOLDER} ${BIN_FOLDER}
+	@echo "Installing tgit..."
+	install -m 555 tgit/tgit ${BIN_FOLDER}
+	install -m 555 tgit/dmenu_tgit ${BIN_FOLDER}
+	install -m 555 tgit/tgit_status ${BIN_FOLDER}
+	@echo "done!"
+
 tpomodoro: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tpomodoro..."
 	install -m 555 tpomodoro/tpomodoro ${BIN_FOLDER}
@@ -80,7 +87,7 @@ uninstall:
 	rm -f ${BIN_FOLDER}/tprogbar
 	@echo "done!"
 
-install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar
+install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar tgit
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearch tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar
+.PHONY: install tsearch tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar tgit

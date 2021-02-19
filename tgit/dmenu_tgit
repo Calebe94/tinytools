@@ -1,12 +1,10 @@
 #!/bin/bash
 
-tgit="/home/gabo/packages/tinytools/tgit/tgit"
-check_status="/home/gabo/packages/tinytools/tgit/check_status"
-repo=$(echo "$($tgit)" | dmenu -i -p Repos: | awk '{print $2}')
+repo=$(echo "$(tgit)" | dmenu -i -p Repos: | awk '{print $2}')
 
 [[ -n $repo ]] || exit
 path="$HOME/$repo"
-prompt=$(print "$repo" | awk -F'/' 'NF>1{print $(NF)}') && prompt="$prompt [$($check_status $path)]:"
+prompt=$(print "$repo" | awk -F'/' 'NF>1{print $(NF)}') && prompt="$prompt [$(tgit_status $path)]:"
 options="open\nstatus\ndiff\ncheckout"
 option=$(echo -e "$options" | dmenu -i -p "$prompt")
 

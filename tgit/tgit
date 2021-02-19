@@ -1,10 +1,9 @@
 #!/bin/bash
 
-check_status="/home/gabo/packages/tinytools/tgit/check_status"
 repos=''
 
 update() {
-    repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
+    repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1' | grep -E -v 'vim|antigen')
     touch /tmp/repos.dat
     echo -e "$repos" > /tmp/repos.dat
 }
@@ -22,7 +21,7 @@ list() {
     do
         cd $i
         if [[ "$(git rev-parse --git-dir)" == ".git" ]]; then
-            status=$($check_status $i $1)
+            status=$(tgit_status $i $1)
             name="${i/"$HOME/"/''}"
             list="$list\n[$status] $name"
         fi
