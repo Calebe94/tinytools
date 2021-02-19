@@ -1,9 +1,11 @@
 #!/bin/bash
 
 repos=''
+ignore_regex='antigen|vim'
 
 update() {
-    repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1' | grep -E -v 'vim|antigen')
+    repos=$(find $HOME -name ".git" | awk -F/ 'BEGIN { OFS = FS } NF{NF-=1};1')
+    [[ -n $ignore_regex ]] && repos=$(echo -e "$repos" | grep -E -v "$ignore_regex")
     touch /tmp/repos.dat
     echo -e "$repos" > /tmp/repos.dat
 }
