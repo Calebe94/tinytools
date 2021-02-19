@@ -13,12 +13,12 @@ case "$option" in
     "checkout")
         branches="$(cd $path && git branch -r)"
         branch=$(echo -e "$branches" | dmenu -i -p Checkout:)
-        x-terminal-emulator -e 'bash -c "cd '$path' && git '$option $branch'; zsh"'
+        x-terminal-emulator -e 'sh -c "cd '$path' && git '$option $branch'; $SHELL"'
     ;;
     "open")
         codium $path
     ;;
     *)
-        x-terminal-emulator -e 'bash -c "cd '$path' && git '$option'; zsh"'
+        x-terminal-emulator -e 'sh -c "cd '$path' && git '$option'; $SHELL"'
     ;;
 esac
