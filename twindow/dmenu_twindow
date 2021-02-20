@@ -2,7 +2,7 @@
 
 twindow="wmctrl -l"
 
-window=$(echo "$($twindow)" | awk '{$1="";$2="";$3=""; print $0}' | dmenu -i -p Windows:)
+window=$(echo "$($twindow)" | awk '{$1="";$2="";$3=""; print $0}' | awk '{$1=$1};1' | dmenu -i -p Windows:)
 echo "$window"
 
 [[ -n $window ]] || exit
