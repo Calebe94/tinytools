@@ -47,7 +47,7 @@ get_value()
 {
    local file=$1
    local path=$2
-   list_all_paths $file | get_matched_path $path | remove_parent_path $path
+   list_all_paths $file | get_matched_path $path | remove_parent_path $path | xargs
 }
 
 list_keys()
