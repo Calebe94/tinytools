@@ -8,6 +8,7 @@ Tiny scripts to improve your productivity.
 * [tmenu](tmenu/README.md) - A simple dmenu wrapper to create menus.
 * [tnotes](tnotes/README.md) - A simple dmenu wrapper to create and access your Markdown notes.
 * [tpomodoro](tpomodoro/README.md) - a simple script to manage your time using the pomodoro technique.
+* [tprogbar](tprogbar/README.md) - a simple commandline tool to help you make your our ASCII progress bar.
 * [tsearch](tsearch/README.md) - A simple tool to request any search the way you want.
 * [ttodo](ttdodo/README.md) - A simple dmenu wrapper to create and access your todo list.
 
