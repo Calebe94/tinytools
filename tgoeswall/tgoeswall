@@ -18,30 +18,23 @@
 GOES_CDN="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/"
 WGET_CMD="wget -N -q --show-progress"
 
+resolution=""
+path=""
+
 usage()
 {
     echo "usage: tgoeswall [-r <resolution>] [-t] [-l]"
     echo "options:"
-    echo "-r: download image by a given resolution(avaliable: 678, 1808, 5424, 10848);"
+    echo "-r: download image by a given resolution(available: 678, 1808, 5424, 10848);"
     echo "-t: download thumbnail image(the smallest image);"
     echo "-l: download latest image(the biggest image)."
-}
-
-
-download_latest()
-{
-    $WGET_CMD $GOES_CDN/latest.jpg
-}
-
-download_thumb()
-{
-    $WGET_CMD $GOES_CDN/thumbnail.jpg
+    exit 0
 }
 
 download_image()
 {
     res="$1"
-    $WGET_CMD $GOES_CDN/$res"x"$res".jpg"
+    $WGET_CMD "$GOES_CDN/$res.jpg"
 }
 
 check_res_argument()
@@ -56,25 +49,37 @@ main()
         case "${args}" in
             r)
                 result=$(check_res_argument "${OPTARG}")
-                [ $result = 0 ] && download_image "${OPTARG}"
-                exit $((result))
+                [ $result = 0 ] && resolution="${OPTARG}x${OPTARG}"
                 ;;
             t)
-                download_thumb
-                exit 0
+                resolution="thumbnail"
                 ;;
             l)
-                download_latest
-                exit 0
+                resolution="latest"
                 ;;
             h | *)
                 usage
                 ;;
         esac
     done
+
+    # Check if the resolution passed match with the resolution available in the goes cdn
+    [ -z "$resolution" ] && echo "resolution does not match the available ones." && usage
+
+    # Check if an argument has been passed without a getopt option, if it is passed, check if it is a valid path
+    shift $(expr $OPTIND - 1 )
+    while test $# -gt 0; do [ -d "$1" ] && path="$1"; shift; done
+
+    # if it is a valid path, add it to wget command
+    [ -z "$path" ] || WGET_CMD+=" -P $path"
+
+    # download the image
+    download_image $resolution
 }
 
 ################################
 #   MAIN
 ################################
+
 [ $# -eq 0 ] && usage || main $@
+
