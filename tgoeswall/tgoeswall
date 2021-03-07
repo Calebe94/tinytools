@@ -1,131 +1,80 @@
-#!/usr/bin/python3
-"""
-    GOES GEOCOLOR - https://www.star.nesdis.noaa.gov/GOES/
-    GOES-East - Latest Full Disk Images
-    Images updated every 10 minutes.
-"""
+#!/bin/bash
 
-import datetime, subprocess, time, os, urllib.request, argparse, logging
+#This file is part of the TinyTools distribution (https://github.com/Calebe94/TinyTools).
+#Copyright (C)  TinyTools
 
-CDN_URL = "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/{}_GOES16-ABI-FD-GEOCOLOR-{}.jpg"
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, version 3 of the License.
 
-IMAGES_RESOLUTIONS = [
-        "339",
-        "678",
-        "1808",
-        "5424",
-        "10848"
-    ]
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
 
-TIME_FORMAT = "%Y%j%H%M"
-WALLPAPERS_FOLDER = "wallpaper"
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-DEFAULT_FOLDER = os.path.abspath(os.path.join(os.path.abspath(__file__), "../", "wallpaper"))
+GOES_CDN="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/"
+WGET_CMD="wget -N -q --show-progress"
 
-class Wallpaper(object):
-    __folder = str()
-    __resolution = str()
-    __utc_time = str()
-    
-    def __init__(self, folder=DEFAULT_FOLDER, resolution=339):
-        self.__folder = folder
-        self.__resolution = "{0}x{0}".format(resolution)
-        if not os.path.isdir(self.__folder):
-            os.mkdir(self.__folder)
-        logging.debug("Program initialized in {} folder.".format(self.__folder))
+usage()
+{
+    echo "usage: tgoeswall [-r <resolution>] [-t] [-l]"
+    echo "options:"
+    echo "-r: download image by a given resolution(avaliable: 678, 1808, 5424, 10848);"
+    echo "-t: download thumbnail image(the smallest image);"
+    echo "-l: download latest image(the biggest image)."
+}
 
-    def delete_last_wallpaper(self, actual_wallpaper):
-        file_lists = os.listdir(self.__folder)
-        logging.debug("Deleting {} files.".format(file_lists))
-        for file in file_lists:
-            if file != actual_wallpaper:
-                os.remove(os.path.join(self.__folder , file))
 
-    def apply_wallpaper(self, filename):
-        logging.debug("Applying {} image as wallpaper.".format(filename))
-        commands = [
-            "feh",
-            "--bg-center",
-            os.path.join(self.__folder, filename)
-        ]
-        subprocess.Popen(commands).wait()
+download_latest()
+{
+    $WGET_CMD $GOES_CDN/latest.jpg
+}
 
-    def apply_last_wallpaper(self):
-        logging.debug("Trying to apply the last image")
-        try:
-            file_lists = os.listdir(self.__folder)
-            file_lists.sort()
-            self.apply_wallpaper(file_lists[-1])
-        except Exception as error:
-            logging.debug(error)
+download_thumb()
+{
+    $WGET_CMD $GOES_CDN/thumbnail.jpg
+}
 
-    def download_image(self, utc_time, resolution):
-        image_url = CDN_URL.format(utc_time, resolution)
-        filename = image_url.split('/')[-1]
-        logging.debug("Downloading {} image.".format(filename))
-        urllib.request.urlretrieve(image_url, self.__folder+"/"+filename)
-        return filename
+download_image()
+{
+    res="$1"
+    $WGET_CMD $GOES_CDN/$res"x"$res".jpg"
+}
 
-    def update_wallpaper(self):
-        last_image = (datetime.datetime.utcnow() - datetime.timedelta(seconds=60*30)).strftime(TIME_FORMAT)
-        last_image = last_image[:-1]+"0"
-        logging.debug("Last UTC image is {}.".format(last_image))
-        try:
-            filename = self.download_image(last_image, self.__resolution)
-            self.apply_wallpaper(filename)
-            self.delete_last_wallpaper(filename)
-            logging.debug("Image {} applied.".format(filename))
-        except Exception as error:
-            logging.debug(error)
+check_res_argument()
+{
+    res="$1"
+    [ "$res" = "678" ] || [ "$res" = "1808" ] || [ "$res" = "5424" ] || [ "$res" = "10848" ] && echo 0 || echo 1
+}
 
-    def run(self):
-        self.apply_last_wallpaper()
-        starttime=time.time()
-        while True:
-            self.update_wallpaper()
-            time.sleep((60*10) - ((time.time() - starttime) % (60*10)))
+main()
+{
+    while getopts "hr:tl" args; do
+        case "${args}" in
+            r)
+                result=$(check_res_argument "${OPTARG}")
+                [ $result = 0 ] && download_image "${OPTARG}"
+                exit $((result))
+                ;;
+            t)
+                download_thumb
+                exit 0
+                ;;
+            l)
+                download_latest
+                exit 0
+                ;;
+            h | *)
+                usage
+                ;;
+        esac
+    done
+}
 
-if __name__ == "__main__":
-    logging.basicConfig(
-        filename=os.path.join('/tmp', 'goeswall.log'), 
-        level=logging.DEBUG, 
-        format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S'
-        )
-    parser = argparse.ArgumentParser(description='GOES Earth images as dynamic wallpaper.')
-    parser.add_argument(
-        '-r',
-        '--resolution',
-        type=str,
-        metavar='',
-        required=False,
-        help='Image Resolution. Should be: 339, 678, 1808, 5424 or 10848'
-        )
-    parser.add_argument(
-        '-p',
-        '--path',
-        type=str,
-        metavar='',
-        required=False,
-        help='path where you want to store the images'
-        )
-    
-    args = parser.parse_args()
-
-    if args.resolution in IMAGES_RESOLUTIONS and args.path:
-        goes_wallpaper = Wallpaper(
-            resolution=args.resolution,
-            folder=args.path
-            )
-    elif args.path:
-        goes_wallpaper = Wallpaper(
-            folder=args.path
-            )
-    elif args.resolution in IMAGES_RESOLUTIONS:
-        goes_wallpaper = Wallpaper(
-            resolution=args.resolution
-            )
-    else:
-        logging.debug("Starting with default values")
-        goes_wallpaper = Wallpaper()
-
-    goes_wallpaper.run()
+################################
+#   MAIN
+################################
+[ $# -eq 0 ] && usage || main $@
