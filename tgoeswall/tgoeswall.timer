@@ -1,9 +1,9 @@
 [Unit]
 Description=Run tgoeswallctrl every 10 minutes
-Requires=tgoeswallctrl.service
+Requires=tgoeswall.service
 
 [Timer]
-Unit=tgoeswallctrl.service
+Unit=tgoeswall.service
 OnUnitInactiveSec=10m
 AccuracySec=1s
 
