@@ -4,14 +4,13 @@ Tiny scripts to improve your productivity.
 
 ## Indexes
 
-* [tcash](tcash/README.md) - pycash is a cli tool which register your expenses in a .csv file.
 * [tgoeswall](tgoeswall/README.md) - make Geostationary Operational Environmental Satellite images, your wallpaper.
 * [tmenu](tmenu/README.md) - A simple dmenu wrapper to create menus.
 * [tnotes](tnotes/README.md) - A simple dmenu wrapper to create and access your Markdown notes.
 * [tpomodoro](tpomodoro/README.md) - a simple script to manage your time using the pomodoro technique.
+* [tprogbar](tprogbar/README.md) - a simple commandline tool to help you make your our ASCII progress bar.
 * [tsearch](tsearch/README.md) - A simple tool to request any search the way you want.
 * [ttodo](ttdodo/README.md) - A simple dmenu wrapper to create and access your todo list.
-* [twindow](twindow/README.md) - A simple python script using dmenu and i3ipc module to list all opened windows in **i3wm** and be able to focus on the one selected.
 
 ## Installation
 
