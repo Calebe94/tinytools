@@ -24,13 +24,13 @@ load_config_file()
 download_goes_image()
 {
     echo "Downloading image with resolution $resolution_image..."
-    tgoeswall -r $resolution_image $aux_image_path
+    tgoeswall -r $resolution_image $image_path
 }
 
 apply_wallpaper()
 {
     echo "Applying image with resolution ($resolution_image) with feh args($feh_args)..."
-    feh $feh_args $image_path/$resolution_image*.jpg
+    DISPLAY=:0 XAUTHORITY=~/.Xauthority feh $feh_args $image_path/$resolution_image*.jpg
 }
 
 [ -f $CFG_FILE_PATH ] && load_config_file
