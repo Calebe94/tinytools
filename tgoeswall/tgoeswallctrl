@@ -1,0 +1,21 @@
+#!/bin/bash
+
+CFG_FILE_PATH="/etc/tgoeswall/tgoeswall.conf"
+
+image_path="/tmp/tgoeswall"
+resolution_image="1808"
+feh_args="--bg-center"
+
+load_config_file()
+{
+    echo "Loading config from file"
+    aux_image_path=$(tyaml $CFG_FILE_PATH -v path)
+    [ ! -z $aux_image_path ] && image_path=$aux_image_path
+    aux_resolution_image=$(tyaml $CFG_FILE_PATH -v resolution)
+    [ ! -z $aux_resolution_image ] && resolution_image=$aux_resolution_image
+    aux_feh_args=$(tyaml $CFG_FILE_PATH -v feh_args)
+    [ ! -z $aux_feh_args ] && feh_args=$aux_feh_args
+}
+
+[ -f $CFG_FILE_PATH ] && load_config_file
+
