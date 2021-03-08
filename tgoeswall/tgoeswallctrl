@@ -8,22 +8,28 @@ feh_args="--bg-max"
 
 load_config_file()
 {
-    echo "Loading config from file"
+    echo "Loading config from file..."
     aux_image_path=$(tyaml $CFG_FILE_PATH -v path)
     [ ! -z $aux_image_path ] && image_path=$aux_image_path
     aux_resolution_image=$(tyaml $CFG_FILE_PATH -v resolution)
     [ ! -z $aux_resolution_image ] && resolution_image=$aux_resolution_image
     aux_feh_args=$(tyaml $CFG_FILE_PATH -v feh_args)
     [ ! -z $aux_feh_args ] && feh_args=$aux_feh_args
+    echo "Config loaded:"
+    echo "$image_path"
+    echo "$resolution_image"
+    echo "$feh_args"
 }
 
 download_goes_image()
 {
+    echo "Downloading image with resolution $resolution_image..."
     tgoeswall -r $resolution_image $aux_image_path
 }
 
 apply_wallpaper()
 {
+    echo "Applying image with resolution ($resolution_image) with feh args($feh_args)..."
     feh $feh_args $image_path/$resolution_image*.jpg
 }
 
