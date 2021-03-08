@@ -1,0 +1,8 @@
+[Unit]
+Description=Service to make Geostationary Operational Environmental Satellite images, your wallpaper.
+Wants=network.target
+After=syslog.target network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/tgoeswallctrl
+
