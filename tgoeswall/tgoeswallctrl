@@ -4,7 +4,7 @@ CFG_FILE_PATH="/etc/tgoeswall/tgoeswall.conf"
 
 image_path="/tmp/tgoeswall"
 resolution_image="1808"
-feh_args="--bg-center"
+feh_args="--bg-max"
 
 load_config_file()
 {
@@ -17,5 +17,20 @@ load_config_file()
     [ ! -z $aux_feh_args ] && feh_args=$aux_feh_args
 }
 
+download_goes_image()
+{
+    tgoeswall -r $resolution_image $aux_image_path
+}
+
+apply_wallpaper()
+{
+    feh $feh_args $image_path/$resolution_image*.jpg
+}
+
 [ -f $CFG_FILE_PATH ] && load_config_file
 
+[ ! -d $image_path ] && mkdir $image_path
+
+download_goes_image
+
+apply_wallpaper
