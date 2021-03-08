@@ -4,5 +4,6 @@ Wants=network.target
 After=syslog.target network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/tgoeswallctrl
+Environment=XAUTHORITY=~/.Xauthority
+ExecStart=/usr/bin/tgoeswallctrl
 
