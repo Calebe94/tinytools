@@ -50,6 +50,11 @@ tnotes: ${CONFIG_FOLDER} ${BIN_FOLDER}
 tgoeswall: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tgoeswall..."
 	install -m 555 tgoeswall/tgoeswall ${BIN_FOLDER}
+	install -m 555 tgoeswall/tgoeswallctrl ${BIN_FOLDER}
+	install tgoeswall/tgoeswall.conf ${CONFIG_FOLDER}
+	install tgoeswall/tgoeswall.service /etc/systemd/user/
+	install tgoeswall/tgoeswall.timer /etc/systemd/user/
+	sudo -u ${SUDO_USER} systemctl --user enable tgoeswall.timer
 	@echo "done!"
 
 tprogbar: ${BIN_FOLDER}
