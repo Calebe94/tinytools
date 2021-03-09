@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CFG_FILE_PATH="/etc/tgoeswall/tgoeswall.conf"
+CFG_FILE_PATH="/etc/tinytools/tgoeswall.conf"
 
 image_path="/tmp/tgoeswall"
 resolution_image="1808"
