@@ -8,6 +8,8 @@ The Geostationary Operational Environmental Satellite system (GOES), operated by
 
 This script downloads one image every 10 minutes from GOES server, and applyes it as your wallpaper.
 
+To install this script, avoid doing it with `root`. Install it using `sudo`.
+
 ## Dependencies
 
 * wget
