@@ -24,7 +24,7 @@ tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
 
 twindow: ${BIN_FOLDER} tyaml
 	@echo "Installing twindow..."
-	install -m 555 twindow/twindow ${BIN_FOLDER}
+	install -m 555 twindow/dmenu_twindow ${BIN_FOLDER}
 	@echo "done!"
 
 tpomodoro: ${CONFIG_FOLDER} ${BIN_FOLDER}
@@ -83,7 +83,7 @@ uninstall:
 	rm -f ${BIN_FOLDER}/tgoeswall
 	rm -fr ${CONFIG_FOLDER}
 	rm -f ${BIN_FOLDER}/tprogbar
-	rm -f ${BIN_FOLDER}/twindow
+	rm -f ${BIN_FOLDER}/dmenu_twindow
 	@echo "done!"
 
 install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar twindow
