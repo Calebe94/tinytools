@@ -5,40 +5,56 @@ A simple script to get values on a yaml file.
 ## Usage:
 To simply list all the possible values and keys found in a yaml file, like this one:
 ```yaml
-parentKey:
-    child1: some value
-    child2: foo
-    child3: bar
-        childAgain: 4
-        anotherChild: more value
-    child3: sumthing
+distros:
+    debian:
+        based_on: independent
+        version: 9
+        version_name: buster
+        wiki: http://www.debian.org/doc/
+    arch:
+        based_on: independent
+        version: rolling release
+        wiki: https://wiki.archlinux.org/
+    manjaro:
+        based_on: Arch
+        version: 20.2
+        wiki: https://wiki.manjaro.org/
 ```
-Just call tyaml followed by the file:
+Just call tyaml followed by the yaml file
 ```bash
-$ tyaml your-file.yaml
+$ tyaml distros.yaml
 ```
-To all keys paths be expressed by dot notation, followed by it's value
+All key paths are expressed by dot notation, followed by it's value
 ```bash
-parentKey.child1:some value
-parentKey.child2:foo
-parentKey.child3:bar
-parentKey.child3.childAgain:4
-parentKey.child3.anotherChild:more value
-parentKey.child3:sumthing
+distros.debian.based_on:independent
+distros.debian.version:9
+distros.debian.version_name:buster
+distros.debian.wiki: http://www.debian.org/doc/
+distros.arch.based_on:independent
+distros.arch.version:rolling release
+distros.arch.wiki: https://wiki.archlinux.org/
+distros.manjaro.based_on:Arch
+distros.manjaro.version:20.2
+distros.manjaro.wiki: https://wiki.manjaro.org/
 ```
 And you can access any specific value `(-v)` by expressing its path
 ```bash
-$ tyaml your-file.yaml -v parentKey.child3
+$ tyaml distros.yaml -v distros.debian.wiki
+```
+```
+http://www.debian.org/doc/
 ```
 
 tyaml also lists keys `(-k)` in a specific point of the yaml tree.
 
 ```bash
-$ tyaml your-file.yaml -k parentKey.child3 #you have to specify the full path
+$ tyaml distros.yaml -k distros.debian  #you have to specify the full path
 ```
 ```
-childAgain
-anotherChild
+based_on
+version
+version_name
+wiki
 ```
 
 ## Dependencies:
