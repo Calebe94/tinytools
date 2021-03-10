@@ -8,7 +8,7 @@ To simply list all the possible values and keys found in a yaml file, like this 
 distros:
     debian:
         based_on: independent
-        version: 9
+        version: 10
         version_name: buster
         wiki: http://www.debian.org/doc/
     arch:
