@@ -22,6 +22,11 @@ tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
 	install tsearch/params.yaml ${CONFIG_FOLDER}
 	@echo "done!"
 
+twindow: ${BIN_FOLDER} tyaml
+	@echo "Installing twindow..."
+	install -m 555 twindow/twindow ${BIN_FOLDER}
+	@echo "done!"
+
 tpomodoro: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tpomodoro..."
 	install -m 555 tpomodoro/tpomodoro ${BIN_FOLDER}
@@ -78,9 +83,10 @@ uninstall:
 	rm -f ${BIN_FOLDER}/tgoeswall
 	rm -fr ${CONFIG_FOLDER}
 	rm -f ${BIN_FOLDER}/tprogbar
+	rm -f ${BIN_FOLDER}/twindow
 	@echo "done!"
 
-install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar
+install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar twindow
 	@echo "tinytools installed successfully!"
 
 .PHONY: install tsearch tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar
