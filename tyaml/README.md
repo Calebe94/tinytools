@@ -1,6 +1,6 @@
 # `tyaml`
 
-A simple script to get values on a yaml file.
+A simple script to parse a yaml file.
 
 ## Usage:
 To simply list all the possible values and keys found in a yaml file, like this one:
