@@ -1,8 +1,30 @@
-# tmenu
+# `tmenu`
+#### A simple dmenu wrapper to create custom menus
 
-A simple dmenu wrapper to create menus.
+You use dmenu and want to build menus in a straight forward way? What about even having submenus? tmenu may help.
 
-Project under development.
+tmenu always need a yaml file that express the custom menu structure, like this one:
+
+```yaml
+quick_menu:
+  network: x-terminal-emulator -e nmtui
+  screenshot:
+    selection: scrot -s '/home/user/%Y-%m-%d-%H_%M_%S.jpg'
+    fullscreen: scrot '/home/user/%Y-%m-%d-%H_%M_%S.jpg'
+  power:
+    shutdown: shutdown -h now
+    reboot: reboot
+    lock: slock
+  dotfiles:
+    vim: vim $HOME/.vimrc
+    bash: vim $HOME/.bashrc
+    tmenus: vim $HOME/tmenus
+  another_option: notify-send "you get the idea"
+```
+```
+tmenu quick_menu.yaml
+```
+
 
 # Team
 
