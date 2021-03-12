@@ -22,9 +22,11 @@ quick_menu:
   another_option: notify-send "you get the idea"
 ```
 ```
-tmenu quick_menu.yaml
+$ tmenu quick_menu.yaml
 ```
-![](.screenshots/example.png)
+<p align="center">
+  <img src=".screenshots/example.png" alt="dmenu example">
+</p>
 
 # Team
 
