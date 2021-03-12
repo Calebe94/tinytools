@@ -24,7 +24,7 @@ quick_menu:
 ```
 tmenu quick_menu.yaml
 ```
-
+![](.screenshots/example.png)
 
 # Team
 
