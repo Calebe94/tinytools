@@ -3,7 +3,9 @@
 
 You use dmenu and want to build menus in a straight forward way? What about even having submenus? tmenu may help.
 
-tmenu always need a yaml file that express the custom menu structure, like this one:
+## Usage
+
+tmenu always needs a yaml file to express the custom menu structure, like this one:
 
 ```yaml
 quick_menu:
@@ -21,11 +23,12 @@ quick_menu:
     tmenus: vim $HOME/tmenus
   another_option: notify-send "you get the idea"
 ```
+So when you call tmenu followed by the file, the menu is opened:
 ```
 $ tmenu quick_menu.yaml
 ```
 <p align="center">
-  <img src=".screenshots/example.png" alt="dmenu example">
+  <img src=".screenshots/example.png" alt="tmenu example">
 </p>
 
 # Team
