@@ -9,9 +9,10 @@ install:
 	@echo "Installing tgoeswall..."
 	install -m 555 tgoeswall $(DESTDIR)$(prefix)/bin/tgoeswall
 	install -m 555 tgoeswallctrl $(DESTDIR)$(prefix)/bin/tgoeswallctrl
-	install -D gtgoeswall.conf /etc/tinytools
+	install -D tgoeswall.conf /etc/tinytools
 	install tgoeswall.service /etc/systemd/user/
 	install tgoeswall.timer /etc/systemd/user/
+	systemctl --global daemon-reload
 	@echo "done!"
 
 clean:
