@@ -12,7 +12,6 @@ install:
 	install -D gtgoeswall.conf /etc/tinytools
 	install tgoeswall.service /etc/systemd/user/
 	install tgoeswall.timer /etc/systemd/user/
-	sudo -u ${SUDO_USER} systemctl --user enable tgoeswall.timer
 	@echo "done!"
 
 clean:
@@ -22,8 +21,7 @@ distclean: clean
 
 uninstall:
 	@echo "Uninstall tgoeswall"
-	sudo -u ${SUDO_USER} systemctl --user stop tgoeswall
-	sudo -u ${SUDO_USER} systemctl --user disable tgoeswall
+	systemctl --disable disable tgoeswall
 	rm -f $(DESTDIR)$(prefix)bin/tgoeswall
 	rm -f $(DESTDIR)$(prefix)bin/tgoeswallctrl
 	rm -f /etc/systemd/user/tgoeswall.service
