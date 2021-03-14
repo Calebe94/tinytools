@@ -52,6 +52,11 @@ apply_wallpaper()
 
 [ ! -d $image_path ] && mkdir $image_path
 
+daemon_reload()
+{
+	systemctl --user daemon-reload
+}
+
 start_method()
 {
     systemctl --user start tgoeswall
@@ -59,7 +64,7 @@ start_method()
 
 enable_method()
 {
-    systemctl --user enable -tgoeswall
+    systemctl --user enable tgoeswall
     start_method
 }
 
@@ -74,6 +79,7 @@ usage()
 
 case "$1" in
     -s | --start | start)
+        daemon_reload
         enable_method
         start_method
         ;;

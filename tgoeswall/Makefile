@@ -12,7 +12,6 @@ install:
 	install -D tgoeswall.conf /etc/tinytools
 	install tgoeswall.service /etc/systemd/user/
 	install tgoeswall.timer /etc/systemd/user/
-	systemctl --global daemon-reload
 	@echo "done!"
 
 clean:
