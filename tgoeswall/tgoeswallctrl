@@ -52,6 +52,38 @@ apply_wallpaper()
 
 [ ! -d $image_path ] && mkdir $image_path
 
-download_goes_image
+start_method()
+{
+    systemctl --user start tgoeswall
+}
 
-apply_wallpaper
+enable_method()
+{
+    systemctl --user enable -tgoeswall
+    start_method
+}
+
+usage()
+{
+    echo "usage: tgoeswallctrl"
+    echo "options:"
+    echo "-s|--start|start: start the service"
+    echo "-h|--help|help: show the usage"
+    exit 0
+}
+
+case "$1" in
+    -s | --start | start)
+        enable_method
+        start_method
+        ;;
+    -h | --help | help)
+        usage
+        ;;
+    *)
+        download_goes_image
+        apply_wallpaper
+        ;;
+
+esac
+
