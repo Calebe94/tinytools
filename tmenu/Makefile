@@ -7,7 +7,7 @@ all:
 
 install:
 	@echo "Installing tmenu..."
-	install -m 555 tmenu $(DESTDIR)$(prefix)/bin/tmenu
+	install -m 555 tmenu $(DESTDIR)/$(prefix)/bin/tmenu
 	install -D menu.yaml -t /etc/tinytools/menu.yaml
 	@echo "done!"
 
@@ -18,7 +18,7 @@ distclean: clean
 
 uninstall:
 	@echo "Uninstall tmenu"
-	rm -f $(DESTDIR)$(prefix)bin/tmenu
+	rm -f $(DESTDIR)/$(prefix)bin/tmenu
 	rm -f /etc/tinytools/menu.yaml
 	@echo "done!"
 
