@@ -15,9 +15,25 @@ To install this script, avoid doing it with `root`. Install it using `sudo`.
 * wget
 * feh
 
+## Instalation
+
+To install `tgoeswall` you can edit the `Makefile` to match your local setup (`tgoeswall` is installed into the `/usr/local/bin` by default).
+
+Afterwards enter the following command to install `tgoeswall` (if necessary as root).
+
+```bash
+sudo make install
+```
+
+After the installation you can enable `tgoeswall` to run as a service by running the following command (as user not as root):
+
+```bash
+tgoeswallctrl start
+```
+
 ## Usage
 
-After installation you can change some configurations by editing a file placed in `/etc/tinytools/tgoeswall.conf`.
+After installation you can change some configurations of `tgoeswall` service by editing a file placed in `/etc/tinytools/tgoeswall.conf`.
 
 The options available are:
 
@@ -46,6 +62,18 @@ Also you can check the script log with `journalctl`:
 
 ```bash
 $ journalctl --user -fu tgoeswall
+```
+
+You can use tgoeswall to download GOES images into your current folder by running the following command:
+
+```bash
+tgoeswall -r 1808
+```
+
+Where `-r` is the image resolution. You can always check the available commands by running:
+
+```bash
+tgoeswall -h
 ```
 
 ## Team
