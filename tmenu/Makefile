@@ -8,7 +8,7 @@ all:
 install:
 	@echo "Installing tmenu..."
 	install -m 555 tmenu $(DESTDIR)$(prefix)/bin/tmenu
-	install -D menu.yaml /etc/tinytools
+	install -D menu.yaml /etc/tinytools/menu.yaml
 	@echo "done!"
 
 clean:
