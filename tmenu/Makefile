@@ -18,7 +18,7 @@ distclean: clean
 
 uninstall:
 	@echo "Uninstall tmenu"
-	rm -f $(DESTDIR)/$(prefix)bin/tmenu
+	rm -f $(DESTDIR)/$(prefix)/bin/tmenu
 	rm -f /etc/tinytools/menu.yaml
 	@echo "done!"
 
