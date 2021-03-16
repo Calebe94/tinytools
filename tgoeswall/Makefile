@@ -21,7 +21,7 @@ distclean: clean
 
 uninstall:
 	@echo "Uninstall tgoeswall"
-	systemctl --user disable tgoeswall
+	systemctl --global disable tgoeswall
 	rm -f $(DESTDIR)$(prefix)bin/tgoeswall
 	rm -f $(DESTDIR)$(prefix)bin/tgoeswallctrl
 	rm -f /etc/systemd/user/tgoeswall.service
