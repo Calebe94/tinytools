@@ -47,11 +47,6 @@ tnotes: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	install -m 555 tnotes/dmenu_tnotes ${BIN_FOLDER}
 	@echo "done!"
 
-tgoeswall: ${CONFIG_FOLDER} ${BIN_FOLDER}
-	@echo "Installing tgoeswall..."
-	install -m 555 tgoeswall/tgoeswall ${BIN_FOLDER}
-	@echo "done!"
-
 tprogbar: ${BIN_FOLDER}
 	@echo "Installing tprogbar..."
 	install -m 555 tprogbar/tprogbar ${BIN_FOLDER}
@@ -65,17 +60,18 @@ uninstall:
 	rm -fr /usr/share/sounds/tpomodoro/
 	rm -f ${BIN_FOLDER}/ttodo
 	rm -f ${BIN_FOLDER}/dmenu_ttodo
-	make -C tmenu/ uninstall
+	${MAKE} -C tmenu/ uninstall
 	rm -f ${BIN_FOLDER}/tyaml
 	rm -f ${BIN_FOLDER}/tnotes
 	rm -f ${BIN_FOLDER}/dmenu_tnotes
-	rm -f ${BIN_FOLDER}/tgoeswall
 	rm -fr ${CONFIG_FOLDER}
 	rm -f ${BIN_FOLDER}/tprogbar
+	${MAKE} -C tgoeswall/ uninstall
 	@echo "done!"
 
-install: tsearch ttodo tyaml tnotes tgoeswall tpomodoro tprogbar
-	make -C tmenu/ install
+install: tsearch ttodo tyaml tnotes tpomodoro tprogbar
+	${MAKE} -C tmenu/ install
+	${MAKE} -C tgoeswall/ install
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearch tpomodoro ttodo tyaml tnotes tgoeswall uninstall tprogbar
+.PHONY: install tsearch tpomodoro ttodo tyaml tnotes uninstall tprogbar

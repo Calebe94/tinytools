@@ -1,0 +1,95 @@
+#!/bin/bash
+
+#This file is part of the TinyTools distribution (https://github.com/Calebe94/TinyTools).
+#Copyright (C)  TinyTools
+
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, version 3 of the License.
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+CFG_FILE_PATH="/etc/tinytools/tgoeswall.conf"
+
+image_path="/tmp/tgoeswall"
+resolution_image="1808"
+feh_args="--bg-max"
+
+load_config_file()
+{
+    echo "Loading config from file..."
+    aux_image_path=$(tyaml $CFG_FILE_PATH -v path)
+    [ ! -z $aux_image_path ] && image_path=$aux_image_path
+    aux_resolution_image=$(tyaml $CFG_FILE_PATH -v resolution)
+    [ ! -z $aux_resolution_image ] && resolution_image=$aux_resolution_image
+    aux_feh_args=$(tyaml $CFG_FILE_PATH -v feh_args)
+    [ ! -z $aux_feh_args ] && feh_args=$aux_feh_args
+    echo "Config loaded:"
+    echo "$image_path"
+    echo "$resolution_image"
+    echo "$feh_args"
+}
+
+download_goes_image()
+{
+    echo "Downloading image with resolution $resolution_image..."
+    tgoeswall -r $resolution_image $image_path
+}
+
+apply_wallpaper()
+{
+    echo "Applying image with resolution ($resolution_image) with feh args($feh_args)..."
+    DISPLAY=:0 XAUTHORITY=~/.Xauthority feh $feh_args $image_path/$resolution_image*.jpg
+}
+
+[ -f $CFG_FILE_PATH ] && load_config_file
+
+[ ! -d $image_path ] && mkdir $image_path
+
+daemon_reload()
+{
+	systemctl --user daemon-reload
+}
+
+start_method()
+{
+    systemctl --user start tgoeswall.timer
+}
+
+enable_method()
+{
+    systemctl --user enable tgoeswall.timer
+    start_method
+}
+
+usage()
+{
+    echo "usage: tgoeswallctrl"
+    echo "options:"
+    echo "-s|--start|start: start the service"
+    echo "-h|--help|help: show the usage"
+    exit 0
+}
+
+case "$1" in
+    -s | --start | start)
+        daemon_reload
+        enable_method
+        start_method
+        ;;
+    -h | --help | help)
+        usage
+        ;;
+    *)
+        download_goes_image
+        apply_wallpaper
+        ;;
+
+esac
+
