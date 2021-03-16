@@ -62,7 +62,7 @@ get_value()
 {
    local file=$1
    local path=$2
-   list_all_paths $file | get_matched_path $path | remove_parent_path $path | xargs
+   list_all_paths $file | get_matched_path $path | remove_parent_path $path | xargs | awk /./
 }
 
 list_keys()
@@ -75,7 +75,7 @@ list_keys()
    else
       keys=$(list_all_paths $file | remove_value | list_matched_paths $path | remove_parent_path $path | get_first_key)
    fi
-   echo -e "$keys" | awk '!seen[$1]++'
+   echo -e "$keys" | awk '!seen[$1]++' | awk /./
 }
 
 usage()
