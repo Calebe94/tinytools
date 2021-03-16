@@ -59,12 +59,12 @@ daemon_reload()
 
 start_method()
 {
-    systemctl --user start tgoeswall
+    systemctl --user start tgoeswall.timer
 }
 
 enable_method()
 {
-    systemctl --user enable tgoeswall
+    systemctl --user enable tgoeswall.timer
     start_method
 }
 
