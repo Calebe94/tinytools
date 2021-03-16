@@ -36,12 +36,6 @@ ttodo: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	install -m 555 ttodo/dmenu_ttodo ${BIN_FOLDER}
 	@echo "done!"
 
-tmenu: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
-	@echo "Installing tmenu..."
-	install -m 555 tmenu/tmenu ${BIN_FOLDER}
-	install tmenu/menu.yaml ${CONFIG_FOLDER}
-	@echo "done!"
-
 tyaml: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing tyaml..."
 	install -m 555 tyaml/tyaml ${BIN_FOLDER}
@@ -71,7 +65,7 @@ uninstall:
 	rm -fr /usr/share/sounds/tpomodoro/
 	rm -f ${BIN_FOLDER}/ttodo
 	rm -f ${BIN_FOLDER}/dmenu_ttodo
-	rm -f ${BIN_FOLDER}/tmenu
+	make -C tmenu/ uninstall
 	rm -f ${BIN_FOLDER}/tyaml
 	rm -f ${BIN_FOLDER}/tnotes
 	rm -f ${BIN_FOLDER}/dmenu_tnotes
@@ -80,7 +74,8 @@ uninstall:
 	rm -f ${BIN_FOLDER}/tprogbar
 	@echo "done!"
 
-install: tsearch ttodo tmenu tyaml tnotes tgoeswall tpomodoro tprogbar
+install: tsearch ttodo tyaml tnotes tgoeswall tpomodoro tprogbar
+	make -C tmenu/ install
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearch tpomodoro ttodo tmenu tyaml tnotes tgoeswall uninstall tprogbar
+.PHONY: install tsearch tpomodoro ttodo tyaml tnotes tgoeswall uninstall tprogbar

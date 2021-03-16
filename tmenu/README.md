@@ -3,6 +3,21 @@
 
 You use dmenu and want to build menus in a straight forward way? What about even having submenus? tmenu may help.
 
+## Dependencies
+
+* [tyaml](https://github.com/Calebe94/tinytools/tree/master/tyaml)
+* [dmenu](http://tools.suckless.org/dmenu/)
+
+## Instalation
+
+To install `tmenu` you can edit the `Makefile` to match your local setup (`tmenu` is installed into the `/usr/local/bin` by default).
+
+Afterwards enter the following command to install `tmenu` (if necessary as root).
+
+```bash
+sudo make install
+```
+
 ## Usage
 
 tmenu always needs a yaml file to express the custom menu structure, like this one:
