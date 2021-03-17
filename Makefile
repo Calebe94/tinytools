@@ -33,11 +33,6 @@ tyaml: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	install -m 555 tyaml/tyaml ${BIN_FOLDER}
 	@echo "done!"
 
-tprogbar: ${BIN_FOLDER}
-	@echo "Installing tprogbar..."
-	install -m 555 tprogbar/tprogbar ${BIN_FOLDER}
-	@echo "done!"
-
 uninstall:
 	@echo "Removing tinytools..."
 	rm -f ${BIN_FOLDER}/tsearch
@@ -49,15 +44,16 @@ uninstall:
 	rm -f ${BIN_FOLDER}/tyaml
 	${MAKE} -C tnotes/ uninstall
 	rm -fr ${CONFIG_FOLDER}
-	rm -f ${BIN_FOLDER}/tprogbar
 	${MAKE} -C tgoeswall/ uninstall
+	${MAKE} -C tprogbar/ uninstall
 	@echo "done!"
 
-install: tsearch ttodo tyaml tprogbar
+install: tsearch ttodo tyaml
 	${MAKE} -C tmenu/ install
 	${MAKE} -C tgoeswall/ install
 	${MAKE} -C tnotes/ install
 	${MAKE} -C tpomodoro/ install
+	${MAKE} -C tprogbar/ install
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearch ttodo tyaml uninstall tprogbar
+.PHONY: install tsearch ttodo tyaml uninstall
