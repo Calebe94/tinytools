@@ -15,13 +15,6 @@ ${CONFIG_FOLDER}:
 	@echo "Creating ${CONFIG_FOLDER} folder ..."
 	mkdir ${CONFIG_FOLDER}
 
-tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
-	@echo "Installing tsearch..."
-	install -m 555 tsearch/tsearch ${BIN_FOLDER}
-	install -m 555 tsearch/dmenu_tsearch ${BIN_FOLDER}
-	install tsearch/params.yaml ${CONFIG_FOLDER}
-	@echo "done!"
-
 ttodo: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing ttodo..."
 	install -m 555 ttodo/ttodo ${BIN_FOLDER}
@@ -35,8 +28,7 @@ tyaml: ${CONFIG_FOLDER} ${BIN_FOLDER}
 
 uninstall:
 	@echo "Removing tinytools..."
-	rm -f ${BIN_FOLDER}/tsearch
-	rm -f ${BIN_FOLDER}/tsearch-dmenu
+	${MAKE} -C tsearch/ uninstall
 	${MAKE} -C tpomodoro/ uninstall
 	rm -f ${BIN_FOLDER}/ttodo
 	rm -f ${BIN_FOLDER}/dmenu_ttodo
@@ -48,7 +40,8 @@ uninstall:
 	${MAKE} -C tprogbar/ uninstall
 	@echo "done!"
 
-install: tsearch ttodo tyaml
+install: ttodo tyaml
+	${MAKE} -C tsearch/ install
 	${MAKE} -C tmenu/ install
 	${MAKE} -C tgoeswall/ install
 	${MAKE} -C tnotes/ install
@@ -56,4 +49,4 @@ install: tsearch ttodo tyaml
 	${MAKE} -C tprogbar/ install
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearch ttodo tyaml uninstall
+.PHONY: install ttodo tyaml uninstall
