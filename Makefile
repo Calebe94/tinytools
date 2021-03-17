@@ -22,14 +22,6 @@ tsearch: ${CONFIG_FOLDER} ${BIN_FOLDER} tyaml
 	install tsearch/params.yaml ${CONFIG_FOLDER}
 	@echo "done!"
 
-tpomodoro: ${CONFIG_FOLDER} ${BIN_FOLDER}
-	@echo "Installing tpomodoro..."
-	install -m 555 tpomodoro/tpomodoro ${BIN_FOLDER}
-	$(eval notification_folder := /usr/share/sounds/tpomodoro/)
-	[ -d $(notification_folder) ] || mkdir -p $(notification_folder)
-	install tpomodoro/Notification.mp3 $(notification_folder)
-	@echo "done!"
-
 ttodo: ${CONFIG_FOLDER} ${BIN_FOLDER}
 	@echo "Installing ttodo..."
 	install -m 555 ttodo/ttodo ${BIN_FOLDER}
@@ -50,8 +42,7 @@ uninstall:
 	@echo "Removing tinytools..."
 	rm -f ${BIN_FOLDER}/tsearch
 	rm -f ${BIN_FOLDER}/tsearch-dmenu
-	rm -f ${BIN_FOLDER}/tpomodoro
-	rm -fr /usr/share/sounds/tpomodoro/
+	${MAKE} -C tpomodoro/ uninstall
 	rm -f ${BIN_FOLDER}/ttodo
 	rm -f ${BIN_FOLDER}/dmenu_ttodo
 	${MAKE} -C tmenu/ uninstall
@@ -62,10 +53,11 @@ uninstall:
 	${MAKE} -C tgoeswall/ uninstall
 	@echo "done!"
 
-install: tsearch ttodo tyaml tpomodoro tprogbar
+install: tsearch ttodo tyaml tprogbar
 	${MAKE} -C tmenu/ install
 	${MAKE} -C tgoeswall/ install
 	${MAKE} -C tnotes/ install
+	${MAKE} -C tpomodoro/ install
 	@echo "tinytools installed successfully!"
 
-.PHONY: install tsearch tpomodoro ttodo tyaml uninstall tprogbar
+.PHONY: install tsearch ttodo tyaml uninstall tprogbar
