@@ -10,15 +10,15 @@ This is a simple script to manage your time using the [pomodoro technique](https
 
 ## Installation
 
-To install `tnotes` you can edit the `Makefile` to match your local setup (`tmenu` is installed into the `/usr/local/bin` by default).
+To install `tpomodoro` you can edit the `Makefile` to match your local setup (`tpomodoro` is installed into the `/usr/local/bin` by default).
 
-Afterwards enter the following command to install `tnotes` (if necessary as root).
+Afterwards enter the following command to install `tpomodoro` (if necessary as root).
 
 ```bash
 sudo make install
 ```
 
-To uninstall `tnotes`, just run:
+To uninstall `tpomodoro`, just run:
 
 ```
 sudo make uninstall
