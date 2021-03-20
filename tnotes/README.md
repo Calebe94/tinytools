@@ -8,7 +8,7 @@ A simple script to create and access [Markdown](https://www.markdownguide.org/) 
 
 ## Installation
 
-To install `tnotes` you can edit the `Makefile` to match your local setup (`tmenu` is installed into the `/usr/local/bin` by default).
+To install `tnotes` you can edit the `Makefile` to match your local setup (`tnotes` is installed into the `/usr/local/bin` by default).
 
 Afterwards enter the following command to install `tnotes` (if necessary as root).
 
