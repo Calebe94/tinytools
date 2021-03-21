@@ -11,6 +11,7 @@ Tiny scripts to improve your productivity.
 * [tprogbar](tprogbar/README.md) - a simple commandline tool to help you make your our ASCII progress bar.
 * [tsearch](tsearch/README.md) - A simple tool to request any search the way you want.
 * [ttodo](ttdodo/README.md) - A simple dmenu wrapper to create and access your todo list.
+* [tyaml](tyaml/README.md) - A simple script to parse a yaml file.
 
 ## Installation
 
