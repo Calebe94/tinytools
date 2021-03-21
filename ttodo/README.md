@@ -26,7 +26,7 @@ sudo make uninstall
 
 `ttodo` can create a todo activity, mark them as done or undo them if you want.
 
-We can do that you by using the options listed bellow:
+We can do that by using the options listed bellow:
 
 * `-a`, `--add` `<name>`: adds a new todo with the title received as argument;
 * `-d`, `--do` `<name>`:  marks the todo activity as done;
