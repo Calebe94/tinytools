@@ -4,6 +4,10 @@ A simple tool to request web queries the way you want
 
 tsearch lets you launch a web search through specified URL and web browser.
 
+## Dependencies
+
+* [tyaml](https://github.com/Calebe94/tinytools/tree/master/tyaml)
+
 ## Installation
 
 To install `tsearch` you can edit the `Makefile` to match your local setup (`tsearch` is installed into the `/usr/local/bin` by default).
