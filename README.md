@@ -23,13 +23,6 @@ Afterwards enter the following command to install **tinytools** (if necessary as
 make install
 ```
 
-Or if you want to install an specific tool, you can run:
-
-```bash
-# if you want to install tsearch for example
-make tsearch
-```
-
 To uninstall **tinytools** you can run:
 
 ```bash
