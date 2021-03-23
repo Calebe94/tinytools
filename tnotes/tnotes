@@ -1,176 +1,104 @@
-"""
-Copyright (C) 2021 TinyTools
+#Copyright (C) 2021 TinyTools
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, version 3 of the License.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-#!/usr/bin/python
+#!/usr/bin/bash
 
-import os
-import datetime
-import subprocess
-import argparse
+note_metadata="---\ntitle: %s\nsubtitle: %s\ndate: %s\ntags: [%s]\n\n---"
+note=""
+new_note=""
+notes_path=""
+action=""
 
-YAML = '---\ntitle: "{0}"\nsubtitle: "{1}"\ndate: "{2}"\ntags: {3}\n---'
+delete_note()
+{
+    rm "$note"
+}
 
+rename_note()
+{
+    mv "$note" "$new_note"
+}
 
-def delete_note(path):
-    to_return = False
-    try:
-        os.remove(path+".md")
-        to_return = True
-    except Exception as exception:
-        print(exception)
+add_note()
+{
+    echo "creating note..."
+    path=$(dirname $note)
+    note_name=$(basename $note)
+    [ -f "$note" ] && echo "note already exists!" && exit 1
+    [ -d "$path" ] || mkdir "$path"
+    echo "# $note_name" > "$note"
 
-    return to_return
+    echo "$note_name created!"
+}
 
+list_notes()
+{
+    find "$notes_path" -type f -follow -print
+}
 
-def rename_note(path, name, new_name):
-    to_return = False
+usage()
+{
+    echo "usage:"
+    exit 0
+}
 
-    try:
-        os.rename(
-            os.path.join(path, name),
-            os.path.join(path, new_name)+".md"
-        )
-        to_return = True
-    except Exception as exception:
-        print(exception)
+parse_arguments()
+{
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            -a | --add | add )
+                [ -z "$action" ] && action="add"
+                [ ! -z "$2" ] && [ -z "$note" ] && note="$2";
+                shift ;;
+            -d | --delete | delete )
+                [ -z "$action" ] && action="delete"
+                [ ! -z "$2" ] && [ -z "$note" ] && note="$2";
+                shift ;;
+            -r | --rename | rename ) 
+                [ -z "$action" ] && action="rename"
+                [ ! -z "$2" ] && [ -z "$note" ] && note="$2";
+                [ ! -z "$3" ] && [ -z "$new_note" ] && new_note="$3";
+                shift ;;
+            -s | --subtitle | subtitle ) subtitle="$2"; shift ;;
+            -p | --path | path ) notes_path="$2"; shift ;;
+            -l | --list | list ) action="list"; shift ;;
+           -h | --help | help)
+                usage 
+                shift ;;
+            -*) echo "unknown option: $1" >&2; exit 1;;
+            *) # preserve positional arguments
+               PARAMS="$PARAMS $1"
+               shift ;;
+            *) usage; shift ;;
+        esac
+    done
+}
 
-    return to_return
+arguments="$@"
+[ -z "$arguments" ] && usage || parse_arguments "$@"
 
+eval set -- "$PARAMS"
 
-def get_file_path(path, filename):
-    try:
-        for root, dirs, files in os.walk(os.path.join(path), topdown=False):
-            for name in files:
-                if os.path.join(path, filename) == os.path.join(root, name):
-                    print(os.path.join(root, name))
+shift $(expr $OPTIND - 1 )
 
-    except Exception as identifier:
-        print(identifier)
+while test $# -gt 0; do [ -d "$1" ] &&  notes_path="$1";shift; done
 
+case "$action" in
+    "add") add_note ;;
+    "list") list_notes ;;
+    "delete") delete_note ;;
+    "rename") rename_note ;;
+    *) usage;;
+esac
 
-def list_notes(path):
-    notes = list()
-
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            notes.append(os.path.join(root, name).replace(path+'/', ''))
-
-    return notes
-
-
-def list_notes_dirs(path):
-    notes_dirs = list()
-
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in dirs:
-            notes_dirs.append(os.path.join(root, name).replace(path+'/', ''))
-
-    return notes_dirs
-
-
-def add_note(path, title_name, subtitle=str(), tags=list()):
-    subtitle = subtitle if subtitle != None else ''
-    tags = tags if tags != None else []
-    file_path = str()
-
-    filename = os.path.basename(os.path.join(path, title_name))
-    path = os.path.dirname(os.path.join(path, title_name))
-
-    if not os.path.isdir(path):
-        os.makedirs(path)
-
-    file_path = os.path.join(path, filename+".md")
-
-    with open(file_path, 'w') as note:
-        note.write(
-            YAML.format(
-                filename,
-                subtitle,
-                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tags)
-        )
-    print("{} added!".format(file_path))
-    return file_path
-
-
-def cli_show_notes(path):
-    notes = list_notes(path)
-
-    for note in notes:
-        print(note)
-
-
-def cli_delete_notes(path):
-    if delete_note(path):
-        print("{} deleted!".format(path))
-    else:
-        print("Error during process!")
-
-
-def cli_rename_note(path, name, new_name):
-    if rename_note(path, name, new_name):
-        print("{} renamed to {}.".format(os.path.basename(path), new_name))
-    else:
-        print("Error during process!")
-
-
-def cli_arguments():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-a', '--add', required=False, help='Add note')
-    parser.add_argument('-s', '--sub', required=False,
-                        help='Add subtitle to note')
-    parser.add_argument('-t', '--tags', required=False,
-                        help='Add tags to note')
-    parser.add_argument('-l', '--list', action='store_true',
-                        default=False, required=False)
-    parser.add_argument('-p', '--path', help='Inform path to notes folder', required=False,
-                        default=os.path.join(os.getenv('HOME'), 'Notes')
-                        )
-    parser.add_argument('-d', '--delete', required=False, help='Remove note')
-    parser.add_argument('-r', '--rename', nargs='+',
-                        required=False, help='Rename note')
-    parser.add_argument('-fp', '--filepath',
-                        required=False, help='Get file path')
-
-    return parser
-
-
-def main():
-    parser = cli_arguments()
-    args = parser.parse_args()
-    PATH = os.path.join(os.getenv('HOME'), 'Notes')
-
-    if args.path:
-        PATH = os.path.join(args.path)
-
-    if args.list:
-        cli_show_notes(PATH)
-    elif args.add:
-        add_note(PATH, args.add, args.sub, args.tags)
-    elif args.delete:
-        cli_delete_notes(os.path.join(PATH, args.delete))
-    elif args.rename:
-        cli_rename_note(PATH, args.rename[0], args.rename[1])
-    elif args.filepath:
-        get_file_path(PATH, args.filepath)
-    else:
-        parser.print_help()
-        parser.exit()
-
-
-if __name__ == "__main__":
-    main()
