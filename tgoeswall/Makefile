@@ -12,6 +12,7 @@ install:
 	install -D tgoeswall.conf /etc/tinytools
 	install tgoeswall.service /etc/systemd/user/
 	install tgoeswall.timer /etc/systemd/user/
+	install tgoeswall.1 $(DESTDIR)$(prefix)/share/man/man1
 	@echo "done!"
 
 clean:
