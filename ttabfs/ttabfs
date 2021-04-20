@@ -1,0 +1,64 @@
+#!/bin/bash
+
+tabfs_mnt_path=$HOME/Projects/TabFS/fs/mnt
+
+[ -z $1 ] || tabfs_mnt_path=$1
+
+select_tab_id()
+{
+    titles_list=""
+    cd $tabfs_mnt_path/tabs/by-id/
+    for tab in * ; do
+        titles_list+="$(cat $tab/title.txt) - $tab"
+        titles_list+='\n'
+    done
+    titles_list=${titles_list::-2} # Remove last \n
+    selected=$(echo -e $titles_list | dmenu -p "TabFS")
+
+    echo $selected | awk -F " - " '{print $NF}'
+}
+
+find_sym_link_by_id()
+{
+    selected_id=$1
+    echo $(find $tabfs_mnt_path/tabs/by-title -name "*_$selected_id")
+}
+
+close_tab()
+{
+    selected_id=$1
+    tab_path=$(find_sym_link_by_id "$selected_id")
+    rm $tab_path
+}
+
+dark_mode_tab()
+{
+    # See: https://codeburst.io/50-shades-of-dark-mode-gray-d3e9907b1194
+    selected_id=$1
+    echo 'document.body.style.background = "black"' > $tabfs_mnt_path/tabs/by-id/$selected_id/execute-script
+}
+
+select_action()
+{
+    actions="close\n"
+    actions+="dark\n"
+    actions+="cancel"
+    tab_id=$1
+    tab_title=$(cat $tabfs_mnt_path/tabs/by-id/$tab_id/title.txt)
+    action_selected=$(echo -e $actions | dmenu -p "$tab_title")
+    case "$action_selected" in
+        dark)
+            dark_mode_tab $tab_id
+            ;;
+        close)
+            close_tab $tab_id
+            ;;
+        cancel | *)
+            echo "Cancel!"
+            ;;
+    esac
+}
+
+selected_id=$(select_tab_id)
+
+[ -z $selected_id ] || select_action $selected_id
