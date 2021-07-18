@@ -1,24 +1,40 @@
 #!/bin/bash
 
-repo=$(echo "$(tgit)" | dmenu -i -p Repos: | awk '{print $2}')
-
-[[ -n $repo ]] || exit
-path="$HOME/$repo"
-prompt=$(print "$repo" | awk -F'/' 'NF>1{print $(NF)}') && prompt="$prompt [$(tgit_status $path)]:"
+is_special_input=1
 options="open\nstatus\ndiff\ncheckout"
-option=$(echo -e "$options" | dmenu -i -p "$prompt")
 
-[[ -n $option ]] || exit
-case "$option" in
-    "checkout")
-        branches="$(cd $path && git branch -r)"
-        branch=$(echo -e "$branches" | dmenu -i -p Checkout:)
-        x-terminal-emulator -e 'sh -c "cd '$path' && git '$option $branch'; $SHELL"'
-    ;;
-    "open")
-        codium $path
-    ;;
-    *)
-        x-terminal-emulator -e 'sh -c "cd '$path' && git '$option'; $SHELL"'
-    ;;
-esac
+list_options(){
+    path="$HOME/$repo"
+    prompt="$(tgit_status $path) $repo"    
+    option=$(echo -e "$options" | dmenu -i -p "$prompt:")
+    [[ -n $option ]] || exit
+    case "$option" in
+        "checkout")
+            branches="$(cd $path && git branch -r)"
+            branch=$(echo -e "$branches" | dmenu -i -p Checkout:)
+            x-terminal-emulator -e 'sh -c "cd '$path' && git '$option $branch'; $SHELL"'
+        ;;
+        "open")
+            codium $path
+        ;;
+        *)
+            x-terminal-emulator -e 'sh -c "cd '$path' && git '$option'; $SHELL"'
+        ;;
+    esac
+}
+
+while [ $is_special_input == 1 ]; do
+    repo=""
+    repo=$(echo -e ">> UPDATE\n$(tgit)" | dmenu -i -p Repos: | awk '{print $2}')
+    [[ -n $repo ]] || exit
+    if [[ $repo == "UPDATE" ]]; then
+        tgit -u
+    else
+        is_special_input=0 
+        list_options
+    fi
+done
+
+exit
+
+
