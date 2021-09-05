@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 #Copyright (C) 2021 TinyTools
 
 #This program is free software: you can redistribute it and/or modify
@@ -12,25 +13,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#!/usr/bin/bash
-
 note_metadata="---\ntitle: %s\nsubtitle: %s\ndate: %s\ntags: [%s]\n\n---"
 note=""
-new_note=""
-notes_path=""
 action=""
+metadata=0
 
-delete_note()
-{
-    rm "$note"
-}
-
-rename_note()
-{
-    mv "$note" "$new_note"
-}
-
-add_note()
+create_note()
 {
     echo "creating note..."
     path=$(dirname $note)
@@ -42,11 +30,6 @@ add_note()
     echo "$note_name created!"
 }
 
-list_notes()
-{
-    find "$notes_path" -type f -follow -print
-}
-
 usage()
 {
     echo "usage:"
@@ -55,50 +38,33 @@ usage()
 
 parse_arguments()
 {
+    # https://stackoverflow.com/a/31443098
     while [ "$#" -gt 0 ]; do
         case "$1" in
-            -a | --add | add )
-                [ -z "$action" ] && action="add"
-                [ ! -z "$2" ] && [ -z "$note" ] && note="$2";
-                shift ;;
-            -d | --delete | delete )
-                [ -z "$action" ] && action="delete"
-                [ ! -z "$2" ] && [ -z "$note" ] && note="$2";
-                shift ;;
-            -r | --rename | rename ) 
-                [ -z "$action" ] && action="rename"
-                [ ! -z "$2" ] && [ -z "$note" ] && note="$2";
-                [ ! -z "$3" ] && [ -z "$new_note" ] && new_note="$3";
-                shift ;;
-            -s | --subtitle | subtitle ) subtitle="$2"; shift ;;
-            -p | --path | path ) notes_path="$2"; shift ;;
-            -l | --list | list ) action="list"; shift ;;
-           -h | --help | help)
-                usage 
-                shift ;;
-            -*) echo "unknown option: $1" >&2; exit 1;;
-            *) # preserve positional arguments
-               PARAMS="$PARAMS $1"
-               shift ;;
-            *) usage; shift ;;
+            -c | --create | create ) [ ! -z "$2" ] && [ -z "$note" ] && note="$2"; shift ;;
+            --subtitle=* | subtitle=* ) subtitle="${1#*=}"; shift ;;
+            --tags=* | tags=* )  tags="${1#*=}"; shift ;;
+            --title=* | title=* ) title="${1#*=}"; shift ;;
+            -m | --metadata | metadata) [ ! -z "$2" ] && metadata=1; shift ;;
+            -h | --help | help) usage; shift ;;
+            -*) 
+                echo "unknown option: $1" >&2; exit 1;;
+            *) PARAMS="$PARAMS $1"; shift ;;
         esac
     done
 }
 
 arguments="$@"
 [ -z "$arguments" ] && usage || parse_arguments "$@"
-
-eval set -- "$PARAMS"
-
-shift $(expr $OPTIND - 1 )
-
-while test $# -gt 0; do [ -d "$1" ] &&  notes_path="$1";shift; done
-
-case "$action" in
-    "add") add_note ;;
-    "list") list_notes ;;
-    "delete") delete_note ;;
-    "rename") rename_note ;;
-    *) usage;;
-esac
-
+echo $note
+echo $metadata
+echo $subtitle
+echo $tags
+echo $title
+if [ -z "$note" ]; then
+    echo "deve informar um path"
+elif [ -f "$note" ]; then
+    echo "nota já existe"
+else
+    echo "cria nota"
+fi

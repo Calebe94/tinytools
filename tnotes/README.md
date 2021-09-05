@@ -28,6 +28,9 @@ sudo make uninstall
 
 We can do that you by using the options listed bellow:
 
+* `-a`, `--add`, `add` `<path>`: add a note to the path informed, it creates a folder if it does not exists;
+
+---
 * `-p`, `--path`: informs the path where the notes will be (or are) being stored;
 * `-a`, `--add` `<name>`: adds a new note with the title received as argument on the path informed with `--path`;
 * `-s`, `--sub` `<subname>`: adds a subtitle received as argument in the note metadata of the note;
@@ -35,12 +38,28 @@ We can do that you by using the options listed bellow:
 * `-l`, `--list`: lists the notes in stored in the path informed with `--path`;
 * `-r`, `--rename` `<name>` `<new name>`: rename note file withe the name informed as argument;
 * `-d`, `--delete` `<name>`: deletes a note with the title received as argument on the path informed with `--path`;
+---
 
 ### Examples:
 
 In these examples we are assuming that your notes dir is `~/notes/`.
 
-* To `add` a note with `subtitle` and `tags`:
+* To `add` a note without metadata:
+
+```bash
+$ tnotes --add "~/notes/test folder/test note.md"
+```
+
+It'll then create a `test folder` inside `~/notes/` folder.
+After thar it will create a note named `test note.md` with `# test note` as content.
+
+* To `add` a note with metadata:
+
+```bash
+$ tnotes --add "~/notes/test folder/test note.md"
+```
+
+
 
 ```bash
 $ tnotes --path ~/notes/ --add "Test Note" --sub "This is a Test" --tags "test, note, markdown"
